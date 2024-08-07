@@ -1,18 +1,16 @@
 import React, { useState } from 'react';
 import { TextField, Button, Container, Typography, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../../Auth/useAuth';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { logIn } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Replace with actual authentication endpoint if not using JWT
+
       const response = await fetch('http://127.0.0.1:3000/users/sign_in', {
         method: 'POST',
         headers: {
@@ -24,7 +22,9 @@ const SignIn = () => {
       const data = await response.json();
 
       if (data.success) {
-        logIn();
+        localStorage.setItem('auth', 'true');
+        localStorage.setItem('username', data.resource.username);
+        localStorage.setItem('user_id', data.resource.id);
         window.location.reload()
         navigate('/');
       } else {
@@ -62,7 +62,7 @@ const SignIn = () => {
       </form>
       <Typography variant="body2" align="center" marginTop={2}>
         <Link href="/sign-up" variant="body2">
-        Sign Up
+          Sign Up
         </Link>
       </Typography>
     </Container>

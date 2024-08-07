@@ -1,20 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Button, IconButton, Drawer, List, ListItem, ListItemText, useMediaQuery, useTheme } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link, useNavigate } from 'react-router-dom';
 
 function Header() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedAuth = localStorage.getItem('auth');
+    setIsLoggedIn(storedAuth === 'true');
+  }, []);
 
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('auth')
+    localStorage.removeItem('auth');
+    localStorage.removeItem('username');
+    localStorage.removeItem('user_id');
+
+    setIsLoggedIn(false);
     window.location.reload()
     navigate('/sign-in');
   };
@@ -70,7 +80,7 @@ function Header() {
             <Button color="inherit" component={Link} to="/deliveries">Deliveries</Button>
             <Button color="inherit" component={Link} to="/meetings">Meetings</Button>
             <Button color="inherit" component={Link} to="/expenses">Expenses</Button>
-            <Button color="error" onClick={handleLogout}>Log Out</Button>
+            {isLoggedIn && <Button color="error" onClick={handleLogout}>Log Out</Button>}
           </>
         )}
       </Toolbar>
