@@ -8,6 +8,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 
 function ProductList() {
@@ -46,6 +47,10 @@ function ProductList() {
     }
   };
 
+  const handleAddProduct = () => {
+    navigate('/add-product'); // Redirect to the add product page
+  };
+
   if (loading) {
     return <CircularProgress />;
   }
@@ -59,25 +64,42 @@ function ProductList() {
   }
 
   return (
-    <List>
-      {productData.map((product) => (
-        <ListItem key={product.id}>
-          <ListItemText
-            primary={
-              <Typography variant="body1">
-                {product.name}
-              </Typography>
-            }
-          />
-          <IconButton edge="end" aria-label="edit" onClick={() => handleEdit(product.id)}>
-            <EditIcon />
-          </IconButton>
-          <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(product.id)}>
-            <DeleteIcon />
-          </IconButton>
-        </ListItem>
-      ))}
-    </List>
+    <div>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleAddProduct}
+        style={{ marginBottom: '16px', marginTop:'10px' }}
+      >
+        Add Product
+      </Button>
+      <List>
+        {productData.map((product) => (
+          <ListItem key={product.id} divider>
+            <ListItemText
+              primary={
+                <Typography variant="h6">
+                  {product.name}
+                </Typography>
+              }
+              secondary={
+                <>
+                  <Typography variant="body2">Description: {product.description}</Typography>
+                  <Typography variant="body2">Price: ${product.price}</Typography>
+                  <Typography variant="body2">Stock: {product.stock_level}</Typography>
+                </>
+              }
+            />
+            <IconButton edge="end" aria-label="edit" onClick={() => handleEdit(product.id)}>
+              <EditIcon />
+            </IconButton>
+            <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(product.id)}>
+              <DeleteIcon />
+            </IconButton>
+          </ListItem>
+        ))}
+      </List>
+    </div>
   );
 }
 

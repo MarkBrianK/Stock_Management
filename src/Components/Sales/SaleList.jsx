@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { List, ListItem, ListItemText, Typography, CircularProgress, IconButton } from "@mui/material";
+import { List, ListItem, ListItemText, Typography, CircularProgress, IconButton, Button } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
@@ -40,24 +40,54 @@ function SaleList() {
     }
   };
 
+  const handleMakeSale = () => {
+    navigate('/add-sale');
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
-  if (salesData.length === 0) return <Typography>No sales available.</Typography>;
 
   return (
-    <List>
-      {salesData.map((sale) => (
-        <ListItem key={sale.id}>
-          <ListItemText primary={sale.name} />
-          <IconButton onClick={() => handleEdit(sale.id)} color="primary">
-            <Edit />
-          </IconButton>
-          <IconButton onClick={() => handleDelete(sale.id)} color="secondary">
-            <Delete />
-          </IconButton>
-        </ListItem>
-      ))}
-    </List>
+    <div>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleMakeSale}
+        style={{ margin: '20px 0' }}
+      >
+        Add Sale
+      </Button>
+      {salesData.length === 0 ? (
+        <Typography>No sales available.</Typography>
+      ) : (
+        <List>
+          {salesData.map((sale) => (
+            <ListItem key={sale.id} divider>
+              <ListItemText
+                primary={
+                  <Typography variant="h6">
+                    {sale.name}
+                  </Typography>
+                }
+                secondary={
+                  <>
+                    <Typography variant="body2">Description: {sale.description}</Typography>
+                    <Typography variant="body2">Amount: ${sale.amount}</Typography>
+                    <Typography variant="body2">Date: {new Date(sale.date).toLocaleDateString()}</Typography>
+                  </>
+                }
+              />
+              <IconButton onClick={() => handleEdit(sale.id)} color="primary">
+                <Edit />
+              </IconButton>
+              <IconButton onClick={() => handleDelete(sale.id)} color="secondary">
+                <Delete />
+              </IconButton>
+            </ListItem>
+          ))}
+        </List>
+      )}
+    </div>
   );
 }
 

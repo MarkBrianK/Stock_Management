@@ -29,7 +29,7 @@ function AddProduct() {
     setLoading(true);
     try {
       await axios.post("http://127.0.0.1:3000/products", productData);
-      navigate("/"); // Redirect to the product list page
+      navigate("/products"); 
     } catch (error) {
       console.error("Error adding product:", error);
       setError("Error adding product");

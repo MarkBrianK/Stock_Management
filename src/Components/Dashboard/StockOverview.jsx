@@ -21,6 +21,7 @@ function StockOverview() {
     };
 
     fetchStockData();
+
   }, []);
 
   if (loading) return <CircularProgress />;
