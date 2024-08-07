@@ -4,6 +4,7 @@ import { Typography, Card, CardContent, CircularProgress } from "@mui/material";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
+import { format, parseISO, isValid } from 'date-fns';
 
 function BrandingOverview() {
   const [data, setData] = useState([]);
@@ -23,20 +24,23 @@ function BrandingOverview() {
         const expensesData = expensesResponse.data;
         const stockData = stockResponse.data;
 
-        const maxLength = Math.max(salesData.length, ordersData.length, expensesData.length, stockData.length);
+        const trends = salesData.map((sale) => {
+          const rawDate = sale.sale_date || '';
+          const parsedDate = parseISO(rawDate);
+          const formattedDate = isValid(parsedDate) ? format(parsedDate, 'yyyy-MM-dd') : rawDate;
 
-        const extendedSalesData = salesData.concat(new Array(maxLength - salesData.length).fill({ date: '', amount: 0 }));
-        const extendedOrdersData = ordersData.concat(new Array(maxLength - ordersData.length).fill({ quantity: 0 }));
-        const extendedExpensesData = expensesData.concat(new Array(maxLength - expensesData.length).fill({ amount: 0 }));
-        const extendedStockData = stockData.concat(new Array(maxLength - stockData.length).fill({ stock_level: 0 }));
+          const order = ordersData.find(order => order.sale_date === sale.sale_date) || {};
+          const expense = expensesData.find(expense => expense.sale_date === sale.sale_date) || {};
+          const stock = stockData.find(product => product.sale_date === sale.sale_date) || {};
 
-        const trends = extendedSalesData.map((sale, index) => ({
-          date: sale.date || 'N/A',
-          sales: sale.amount || 0,
-          orders: extendedOrdersData[index] ? extendedOrdersData[index].quantity : 0,
-          profit: sale.amount - (extendedExpensesData[index] ? extendedExpensesData[index].amount : 0),
-          stock: extendedStockData[index] ? extendedStockData[index].stock_level : 0
-        }));
+          return {
+            date: formattedDate,
+            sales: parseFloat(sale.total_price) || 0,
+            orders: parseFloat(order.quantity) || 0,
+            profit: parseFloat(sale.total_price) - parseFloat(expense.amount) || 0,
+            stock: parseFloat(stock.stock_level) || 0
+          };
+        });
 
         setData(trends);
         setLoading(false);

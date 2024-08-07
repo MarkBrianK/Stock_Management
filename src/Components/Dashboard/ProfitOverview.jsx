@@ -42,15 +42,16 @@ function ProfitOverview() {
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
-  const totalSales = salesData.reduce((acc, sale) => acc + sale.amount, 0); // Adjust the data structure as needed
-  const totalExpenses = expensesData.reduce((acc, expense) => acc + expense.amount, 0); // Adjust the data structure as needed
+  // Ensure `amount` is treated as a number
+  const totalSales = salesData.reduce((acc, sale) => acc + (parseFloat(sale.total_price) || 0), 0);
+  const totalExpenses = expensesData.reduce((acc, expense) => acc + (parseFloat(expense.amount) || 0), 0);
   const totalProfit = totalSales - totalExpenses;
 
   return (
     <Card>
       <CardContent>
         <Typography variant="h6">Total Profit</Typography>
-        <Typography variant="h4">{totalProfit}</Typography>
+        <Typography variant="h4">${totalProfit.toFixed(2)}</Typography>
       </CardContent>
     </Card>
   );

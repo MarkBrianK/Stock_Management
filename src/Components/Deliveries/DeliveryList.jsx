@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { List, ListItem, ListItemText, Typography, CircularProgress, IconButton, Button, Box } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
+import { List, ListItem, ListItemText, Typography, CircularProgress, IconButton, Button, Box, TextField } from "@mui/material";
+import { Edit, Delete, Save, Cancel } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
 function DeliveryList() {
   const [deliveryData, setDeliveryData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [editingId, setEditingId] = useState(null);
+  const [editValues, setEditValues] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,8 +28,30 @@ function DeliveryList() {
     fetchDeliveries();
   }, []);
 
-  const handleEdit = (id) => {
-    navigate(`/edit-delivery/${id}`);
+  const handleEdit = (delivery) => {
+    setEditingId(delivery.id);
+    setEditValues({
+      address: delivery.address,
+      delivery_date: new Date(delivery.delivery_date).toISOString().split('T')[0],
+      status: delivery.status
+    });
+  };
+
+  const handleSave = async (id) => {
+    try {
+      await axios.put(`http://127.0.0.1:3000/deliveries/${id}`, editValues);
+      setDeliveryData((prevData) => prevData.map((delivery) =>
+        delivery.id === id ? { ...delivery, ...editValues } : delivery
+      ));
+      setEditingId(null);
+    } catch (error) {
+      console.error('Error updating delivery:', error);
+      setError('Error updating delivery');
+    }
+  };
+
+  const handleCancel = () => {
+    setEditingId(null);
   };
 
   const handleDelete = async (id) => {
@@ -44,6 +68,14 @@ function DeliveryList() {
     navigate("/add-delivery");
   };
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditValues((prevValues) => ({
+      ...prevValues,
+      [name]: value
+    }));
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
@@ -58,16 +90,53 @@ function DeliveryList() {
         <List>
           {deliveryData.map((delivery) => (
             <ListItem key={delivery.id}>
-              <ListItemText
-                primary={delivery.address}
-                secondary={`Delivery Date: ${new Date(delivery.delivery_date).toLocaleDateString()} - Status: ${delivery.status}`}
-              />
-              <IconButton onClick={() => handleEdit(delivery.id)} color="primary">
-                <Edit />
-              </IconButton>
-              <IconButton onClick={() => handleDelete(delivery.id)} color="secondary">
-                <Delete />
-              </IconButton>
+              {editingId === delivery.id ? (
+                <Box display="flex" flexDirection="column" width="100%">
+                  <TextField
+                    label="Address"
+                    name="address"
+                    value={editValues.address}
+                    onChange={handleChange}
+                    margin="normal"
+                  />
+                  <TextField
+                    label="Delivery Date"
+                    name="delivery_date"
+                    type="date"
+                    value={editValues.delivery_date}
+                    onChange={handleChange}
+                    margin="normal"
+                  />
+                  <TextField
+                    label="Status"
+                    name="status"
+                    value={editValues.status}
+                    onChange={handleChange}
+                    margin="normal"
+                  />
+                  <Box display="flex" justifyContent="flex-end" marginTop={1}>
+                    <IconButton onClick={() => handleSave(delivery.id)} color="primary">
+                      <Save />
+                    </IconButton>
+                    <IconButton onClick={handleCancel} color="default">
+                      <Cancel />
+                    </IconButton>
+                  </Box>
+                </Box>
+              ) : (
+                <Box width="100%">
+                  <ListItemText
+                    primary={delivery.address}
+                    secondary={`Delivery Date: ${new Date(delivery.delivery_date).toLocaleDateString()} - Status: ${delivery.status}`}
+                  />
+                  <IconButton onClick={() => handleEdit(delivery)} color="primary">
+                    <Edit />
+                  </IconButton>
+                  <IconButton onClick={() => handleDelete(delivery.id)} color="secondary">
+                    <Delete />
+                  </IconButton>
+                </Box>
+              )}
             </ListItem>
           ))}
         </List>

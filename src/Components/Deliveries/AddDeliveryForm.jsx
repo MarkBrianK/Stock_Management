@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 
 function AddDeliveryForm() {
   const [deliveryData, setDeliveryData] = useState({
-    address: "",
+    order_id: "", // Ensure the delivery is associated with an order
+    scheduled_date: "",
     delivery_date: "",
     status: ""
   });
@@ -25,7 +26,7 @@ function AddDeliveryForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://127.0.0.1:3000/deliveries", deliveryData);
+      await axios.post("http://127.0.0.1:3000/deliveries", { delivery: deliveryData });
       navigate("/deliveries"); // Redirect to the deliveries list page
     } catch (error) {
       console.error('Error adding delivery:', error);
@@ -42,15 +43,24 @@ function AddDeliveryForm() {
       {error && <Typography color="error">{error}</Typography>}
       <form onSubmit={handleSubmit}>
         <TextField
-          label="Address"
-          name="address"
-          value={deliveryData.address}
+          label="Order ID"
+          name="order_id"
+          value={deliveryData.order_id}
           onChange={handleChange}
           fullWidth
           margin="normal"
         />
         <TextField
-          label=""
+          label="Scheduled Date"
+          name="scheduled_date"
+          type="date"
+          value={deliveryData.scheduled_date}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Delivery Date"
           name="delivery_date"
           type="date"
           value={deliveryData.delivery_date}

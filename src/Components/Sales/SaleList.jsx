@@ -66,14 +66,18 @@ function SaleList() {
               <ListItemText
                 primary={
                   <Typography variant="h6">
-                    {sale.name}
+                    Sale ID: {sale.id}
                   </Typography>
                 }
                 secondary={
                   <>
-                    <Typography variant="body2">Description: {sale.description}</Typography>
-                    <Typography variant="body2">Amount: ${sale.amount}</Typography>
-                    <Typography variant="body2">Date: {new Date(sale.date).toLocaleDateString()}</Typography>
+                    <Typography variant="body2">Product ID: {sale.product_id}</Typography>
+                    <Typography variant="body2">
+                      User: {sale.user ? sale.user.username : 'No user info'}
+                    </Typography>
+                    <Typography variant="body2">Quantity: {sale.quantity}</Typography>
+                    <Typography variant="body2">Total Price: ${sale.total_price}</Typography>
+                    <Typography variant="body2">Date: {new Date(sale.sale_date).toLocaleDateString()}</Typography>
                   </>
                 }
               />

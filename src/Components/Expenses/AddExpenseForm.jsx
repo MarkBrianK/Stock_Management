@@ -7,7 +7,8 @@ function AddExpenseForm() {
   const [expenseData, setExpenseData] = useState({
     description: "",
     amount: "",
-    date: ""
+    expense_date: "", // Adjusted to match Rails backend
+    category: "" // Adding category field
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -25,7 +26,7 @@ function AddExpenseForm() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://127.0.0.1:3000/expenses", expenseData);
+      await axios.post("http://127.0.0.1:3000/expenses", { expense: expenseData });
       navigate("/expenses"); // Redirect to the expenses list page
     } catch (error) {
       console.error('Error adding expense:', error);
@@ -59,10 +60,18 @@ function AddExpenseForm() {
           margin="normal"
         />
         <TextField
-          label="Date"
-          name="date"
+          label=""
+          name="expense_date"
           type="date"
-          value={expenseData.date}
+          value={expenseData.expense_date}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Category"
+          name="category"
+          value={expenseData.category}
           onChange={handleChange}
           fullWidth
           margin="normal"

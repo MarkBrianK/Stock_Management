@@ -113,7 +113,7 @@ function AddSaleForm() {
           >
             {users.map((user) => (
               <MenuItem key={user.id} value={user.id}>
-                {user.name}
+                {user.username}
               </MenuItem>
             ))}
           </Select>

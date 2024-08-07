@@ -26,13 +26,14 @@ function SalesOverview() {
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
-  const totalSales = salesData.reduce((acc, sale) => acc + sale.amount, 0);
+  // Calculate total sales, ensuring amount is treated as a number
+  const totalSales = salesData.reduce((acc, sale) => acc + (parseFloat(sale.total_price) || 0), 0);
 
   return (
     <Card>
       <CardContent>
         <Typography variant="h6">Total Sales Amount</Typography>
-        <Typography variant="h4">{totalSales}</Typography>
+        <Typography variant="h4">${totalSales.toFixed(2)}</Typography>
       </CardContent>
     </Card>
   );
