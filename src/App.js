@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-d
 import useAuth from './Auth/useAuth';
 import Header from './Components/Common/Header';
 import Footer from './Components/Common/Footer';
+import Home from './Components/Common/Home';
 import ProductList from './Components/Inventory/ProductList';
 import ProductDetails from './Components/Inventory/ProductDetails';
 import EditProduct from './Components/Inventory/EditProductForm';
@@ -25,7 +26,7 @@ import MeetingList from './Components/Meetings/MeetingList';
 import MeetingDetails from './Components/Meetings/MeetingDetails';
 import AddMeetingForm from './Components/Meetings/AddMeetingfrom';
 import MeetingReminder from './Components/Meetings/MeetingReminder';
-import SignIn from './Components/Users/Signin'
+import SignIn from './Components/Users/Signin';
 import SignUp from './Components/Users/Signup';
 
 function App() {
@@ -33,12 +34,13 @@ function App() {
 
   return (
     <Router>
-    {isLoggedIn && <Header />}
+      {isLoggedIn && <Header />}
       <main>
         <Routes>
-          <Route path="/" element={isLoggedIn ? <Navigate to="/products" /> : <SignIn />} />
-          <Route path="/sign-in" element={isLoggedIn ? <Navigate to="/products" /> : <SignIn />} />
-          <Route path="/sign-up" element={isLoggedIn ? <Navigate to="/products" /> : <SignUp />} />
+          {/* Public Routes */}
+          <Route path="/" element={isLoggedIn ? <Home /> : <Navigate to="/sign-in" />} />
+          <Route path="/sign-in" element={isLoggedIn ? <Navigate to="/" /> : <SignIn />} />
+          <Route path="/sign-up" element={isLoggedIn ? <Navigate to="/" /> : <SignUp />} />
 
           {/* Protected Routes */}
           <Route path="/products" element={isLoggedIn ? <ProductList /> : <Navigate to="/sign-in" />} />

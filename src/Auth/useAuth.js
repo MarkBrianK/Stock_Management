@@ -1,51 +1,28 @@
 import { useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
 
 const useAuth = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [token, setToken] = useState(null);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('jwt');
-    if (storedToken) {
-      try {
-        const decodedToken = jwtDecode(storedToken);
-        const isTokenExpired = decodedToken.exp * 1000 < Date.now();
-
-        if (!isTokenExpired) {
-          setIsLoggedIn(true);
-          setToken(storedToken);
-        } else {
-          localStorage.removeItem('jwt');
-          setIsLoggedIn(false);
-        }
-      } catch (e) {
-        localStorage.removeItem('jwt');
-        setIsLoggedIn(false);
-      }
+    const storedAuth = localStorage.getItem('auth');
+    if (storedAuth === 'true') {
+      setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
     }
   }, []);
 
-  const logIn = (newToken) => {
-    localStorage.setItem('jwt', newToken);
-    const decodedToken = jwtDecode(newToken);
-    const isTokenExpired = decodedToken.exp * 1000 < Date.now();
-
-    if (!isTokenExpired) {
-      setIsLoggedIn(true);
-      setToken(newToken);
-    }
+  const logIn = () => {
+    localStorage.setItem('auth', 'true');
+    setIsLoggedIn(true);
   };
 
   const logOut = () => {
-    localStorage.removeItem('jwt');
+    localStorage.removeItem('auth');
     setIsLoggedIn(false);
-    setToken(null);
   };
 
-  return { isLoggedIn, logIn, logOut, token };
+  return { isLoggedIn, logIn, logOut };
 };
 
 export default useAuth;

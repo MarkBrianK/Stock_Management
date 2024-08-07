@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, IconButton, Drawer, List, ListItem, ListItemText, useMediaQuery, useTheme } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 function Header() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const navigate = useNavigate();
 
   const handleDrawerToggle = () => {
     setDrawerOpen(!drawerOpen);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('auth')
+    window.location.reload()
+    navigate('/sign-in');
   };
 
   const drawer = (
@@ -36,8 +43,8 @@ function Header() {
         <ListItem button component={Link} to="/expenses" onClick={handleDrawerToggle}>
           <ListItemText primary="Expenses" />
         </ListItem>
-        <ListItem button component={Link} to="/users" onClick={handleDrawerToggle}>
-          <ListItemText primary="Users" />
+        <ListItem button onClick={handleLogout}>
+          <ListItemText primary="Log Out" sx={{ color: 'red' }} />
         </ListItem>
       </List>
     </div>
@@ -63,7 +70,7 @@ function Header() {
             <Button color="inherit" component={Link} to="/deliveries">Deliveries</Button>
             <Button color="inherit" component={Link} to="/meetings">Meetings</Button>
             <Button color="inherit" component={Link} to="/expenses">Expenses</Button>
-            <Button color="inherit" component={Link} to="/users">Users</Button>
+            <Button color="error" onClick={handleLogout}>Log Out</Button>
           </>
         )}
       </Toolbar>

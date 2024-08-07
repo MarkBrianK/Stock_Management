@@ -12,7 +12,8 @@ const SignIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('/users/sign_in', {
+      // Replace with actual authentication endpoint if not using JWT
+      const response = await fetch('http://127.0.0.1:3000/users/sign_in', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -23,7 +24,8 @@ const SignIn = () => {
       const data = await response.json();
 
       if (data.success) {
-        logIn(data.token); // Assuming the token is returned in the response
+        logIn();
+        window.location.reload()
         navigate('/');
       } else {
         alert(data.message);
@@ -60,7 +62,7 @@ const SignIn = () => {
       </form>
       <Typography variant="body2" align="center" marginTop={2}>
         <Link href="/sign-up" variant="body2">
-          Don't have an account? Sign Up
+        Sign Up
         </Link>
       </Typography>
     </Container>
