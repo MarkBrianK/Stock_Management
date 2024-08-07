@@ -50,7 +50,7 @@ function AddDeliveryForm() {
           margin="normal"
         />
         <TextField
-          label="Delivery Date"
+          label=""
           name="delivery_date"
           type="date"
           value={deliveryData.delivery_date}

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { List, ListItem, ListItemText, Typography, CircularProgress, IconButton } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { List, ListItem, ListItemText, Typography, CircularProgress, IconButton, Button, Box } from "@mui/material";
+import { Edit, Delete, Visibility } from "@mui/icons-material";
+import { useNavigate, Link } from "react-router-dom";
 
 function OrderList() {
   const [ordersData, setOrdersData] = useState([]);
@@ -40,24 +40,39 @@ function OrderList() {
     }
   };
 
+  const handleAddOrder = () => {
+    navigate("/add-order");
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
-  if (ordersData.length === 0) return <Typography>No orders available.</Typography>;
 
   return (
-    <List>
-      {ordersData.map((order) => (
-        <ListItem key={order.id}>
-          <ListItemText primary={order.name} />
-          <IconButton onClick={() => handleEdit(order.id)} color="primary">
-            <Edit />
-          </IconButton>
-          <IconButton onClick={() => handleDelete(order.id)} color="secondary">
-            <Delete />
-          </IconButton>
-        </ListItem>
-      ))}
-    </List>
+    <Box>
+      <Button variant="contained" color="primary" onClick={handleAddOrder} style={{ marginBottom: 16, marginTop:"10px" }}>
+        Add Order
+      </Button>
+      {ordersData.length === 0 ? (
+        <Typography>No orders available.</Typography>
+      ) : (
+        <List>
+          {ordersData.map((order) => (
+            <ListItem key={order.id} divider>
+              <ListItemText primary={order.name} />
+              <IconButton component={Link} to={`/order-details/${order.id}`} color="info">
+                <Visibility />
+              </IconButton>
+              <IconButton onClick={() => handleEdit(order.id)} color="primary">
+                <Edit />
+              </IconButton>
+              <IconButton onClick={() => handleDelete(order.id)} color="secondary">
+                <Delete />
+              </IconButton>
+            </ListItem>
+          ))}
+        </List>
+      )}
+    </Box>
   );
 }
 

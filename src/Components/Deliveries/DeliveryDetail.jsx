@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
-import { Typography, CircularProgress } from "@mui/material";
+import { Typography, CircularProgress, Box, Paper } from "@mui/material";
 
 function DeliveryDetails() {
   const { id } = useParams();
@@ -30,14 +30,24 @@ function DeliveryDetails() {
   if (!deliveryData) return <Typography>No delivery data available.</Typography>;
 
   return (
-    <div>
-      <Typography variant="h4">Delivery Details</Typography>
-      <Typography variant="h6">Delivery ID: {deliveryData.id}</Typography>
-      <Typography variant="body1">Address: {deliveryData.address}</Typography>
-      <Typography variant="body1">Delivery Date: {new Date(deliveryData.delivery_date).toLocaleDateString()}</Typography>
-      <Typography variant="body1">Status: {deliveryData.status}</Typography>
-      {/* Add more details as needed */}
-    </div>
+    <Box padding={3}>
+      <Paper elevation={3} style={{ padding: 16 }}>
+        <Typography variant="h4" gutterBottom>
+          Delivery Details
+        </Typography>
+        <Typography variant="h6">Delivery ID: {deliveryData.id}</Typography>
+        <Typography variant="body1" paragraph>
+          <strong>Address:</strong> {deliveryData.address}
+        </Typography>
+        <Typography variant="body1" paragraph>
+          <strong>Delivery Date:</strong> {new Date(deliveryData.delivery_date).toLocaleDateString()}
+        </Typography>
+        <Typography variant="body1" paragraph>
+          <strong>Status:</strong> {deliveryData.status}
+        </Typography>
+        {/* Add more details as needed */}
+      </Paper>
+    </Box>
   );
 }
 

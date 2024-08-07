@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Typography, List, ListItem, CircularProgress } from "@mui/material";
+import { Typography, List, ListItem, CircularProgress, ListItemText, Box } from "@mui/material";
 
 function MeetingReminder() {
   const [meetings, setMeetings] = useState([]);
@@ -11,7 +11,9 @@ function MeetingReminder() {
     const fetchMeetings = async () => {
       try {
         const response = await axios.get('http://127.0.0.1:3000/meetings');
-        const upcomingMeetings = response.data.filter(meeting => new Date(meeting.date) > new Date());
+        const upcomingMeetings = response.data
+          .filter(meeting => new Date(meeting.date) > new Date())
+          .sort((a, b) => new Date(a.date) - new Date(b.date)); // Sort by date
         setMeetings(upcomingMeetings);
         setLoading(false);
       } catch (error) {
@@ -28,16 +30,25 @@ function MeetingReminder() {
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <div>
-      <Typography variant="h4">Upcoming Meetings</Typography>
-      <List>
-        {meetings.map((meeting) => (
-          <ListItem key={meeting.id}>
-            <Typography variant="body1">{meeting.title} - {new Date(meeting.date).toLocaleDateString()}</Typography>
-          </ListItem>
-        ))}
-      </List>
-    </div>
+    <Box>
+      <Typography variant="h4" gutterBottom>
+        Upcoming Meetings
+      </Typography>
+      {meetings.length === 0 ? (
+        <Typography>No upcoming meetings.</Typography>
+      ) : (
+        <List>
+          {meetings.map((meeting) => (
+            <ListItem key={meeting.id}>
+              <ListItemText
+                primary={meeting.title}
+                secondary={`Date: ${new Date(meeting.date).toLocaleDateString()} | Time: ${new Date(meeting.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`}
+              />
+            </ListItem>
+          ))}
+        </List>
+      )}
+    </Box>
   );
 }
 

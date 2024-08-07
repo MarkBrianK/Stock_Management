@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { List, ListItem, ListItemText, Typography, CircularProgress, IconButton } from "@mui/material";
+import { List, ListItem, ListItemText, Typography, CircularProgress, IconButton, Button, Box } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
@@ -40,24 +40,36 @@ function ExpenseList() {
     }
   };
 
+  const handleAddExpense = () => {
+    navigate("/add-expense");
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
-  if (expenseData.length === 0) return <Typography>No expenses available.</Typography>;
 
   return (
-    <List>
-      {expenseData.map((expense) => (
-        <ListItem key={expense.id}>
-          <ListItemText primary={expense.description} secondary={`Amount: ${expense.amount}`} />
-          <IconButton onClick={() => handleEdit(expense.id)} color="primary">
-            <Edit />
-          </IconButton>
-          <IconButton onClick={() => handleDelete(expense.id)} color="secondary">
-            <Delete />
-          </IconButton>
-        </ListItem>
-      ))}
-    </List>
+    <Box padding={3}>
+      <Button variant="contained" color="primary" onClick={handleAddExpense} style={{ marginBottom: 16 }}>
+        Add Expense
+      </Button>
+      {expenseData.length === 0 ? (
+        <Typography>No expenses available.</Typography>
+      ) : (
+        <List>
+          {expenseData.map((expense) => (
+            <ListItem key={expense.id}>
+              <ListItemText primary={expense.description} secondary={`Amount: ${expense.amount}`} />
+              <IconButton onClick={() => handleEdit(expense.id)} color="primary">
+                <Edit />
+              </IconButton>
+              <IconButton onClick={() => handleDelete(expense.id)} color="secondary">
+                <Delete />
+              </IconButton>
+            </ListItem>
+          ))}
+        </List>
+      )}
+    </Box>
   );
 }
 

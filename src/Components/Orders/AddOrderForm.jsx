@@ -8,7 +8,8 @@ function AddOrderForm() {
     customer_name: "",
     order_date: "",
     total_amount: "",
-    status: ""
+    status: "",
+    delivery_id: ""  // New field for delivery
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -51,7 +52,7 @@ function AddOrderForm() {
           margin="normal"
         />
         <TextField
-          label="Order Date"
+          label=""
           name="order_date"
           type="date"
           value={orderData.order_date}
@@ -72,6 +73,14 @@ function AddOrderForm() {
           label="Status"
           name="status"
           value={orderData.status}
+          onChange={handleChange}
+          fullWidth
+          margin="normal"
+        />
+        <TextField
+          label="Delivery ID"  // New field for delivery
+          name="delivery_id"
+          value={orderData.delivery_id}
           onChange={handleChange}
           fullWidth
           margin="normal"

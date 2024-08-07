@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { List, ListItem, ListItemText, Typography, CircularProgress, IconButton } from "@mui/material";
+import { List, ListItem, ListItemText, Typography, CircularProgress, IconButton, Button, Box } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
@@ -40,24 +40,39 @@ function DeliveryList() {
     }
   };
 
+  const handleAddDelivery = () => {
+    navigate("/add-delivery");
+  };
+
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
-  if (deliveryData.length === 0) return <Typography>No deliveries available.</Typography>;
 
   return (
-    <List>
-      {deliveryData.map((delivery) => (
-        <ListItem key={delivery.id}>
-          <ListItemText primary={delivery.address} />
-          <IconButton onClick={() => handleEdit(delivery.id)} color="primary">
-            <Edit />
-          </IconButton>
-          <IconButton onClick={() => handleDelete(delivery.id)} color="secondary">
-            <Delete />
-          </IconButton>
-        </ListItem>
-      ))}
-    </List>
+    <Box padding={3}>
+      <Button variant="contained" color="primary" onClick={handleAddDelivery} style={{ marginBottom: 16 }}>
+        Add Delivery
+      </Button>
+      {deliveryData.length === 0 ? (
+        <Typography>No deliveries available.</Typography>
+      ) : (
+        <List>
+          {deliveryData.map((delivery) => (
+            <ListItem key={delivery.id}>
+              <ListItemText
+                primary={delivery.address}
+                secondary={`Delivery Date: ${new Date(delivery.delivery_date).toLocaleDateString()} - Status: ${delivery.status}`}
+              />
+              <IconButton onClick={() => handleEdit(delivery.id)} color="primary">
+                <Edit />
+              </IconButton>
+              <IconButton onClick={() => handleDelete(delivery.id)} color="secondary">
+                <Delete />
+              </IconButton>
+            </ListItem>
+          ))}
+        </List>
+      )}
+    </Box>
   );
 }
 
