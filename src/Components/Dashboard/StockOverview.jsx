@@ -57,6 +57,24 @@ function StockOverview() {
           text: 'Stock Level',
         },
       },
+      plotOptions: {
+        bar: {
+          colors: {
+            ranges: [
+              {
+                from: 0,
+                to: 20,
+                color: '#FF0000',
+              },
+              {
+                from: 21,
+                to: Number.MAX_VALUE,
+                color: '#00A86B',
+              },
+            ],
+          },
+        },
+      },
     },
   };
 
