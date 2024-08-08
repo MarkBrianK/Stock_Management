@@ -32,7 +32,7 @@ const SignUp = () => {
       const data = await response.json();
 
       if (data.success) {
-        window.location.reload()
+  
         navigate('/sign-in');
       } else {
         alert(data.message);

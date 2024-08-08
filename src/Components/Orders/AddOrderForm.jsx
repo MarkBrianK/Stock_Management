@@ -30,8 +30,8 @@ function AddOrderForm() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Assuming currentUserId is obtained from some authentication context or similar
-  const currentUserId = 1;
+
+  const currentUserId = localStorage.getItem('user_id');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -91,8 +91,16 @@ function AddOrderForm() {
       // Submit order first
       const orderResponse = await axios.post("http://127.0.0.1:3000/orders", {
         order: {
-          ...orderData,
-          user_id: currentUserId
+          order_date: orderData.order_date,
+          status: orderData.status,
+          user_id: currentUserId,
+          order_details_attributes: [
+            {
+              product_id: orderData.product_id,
+              quantity: orderData.quantity,
+              price: orderData.price
+            }
+          ]
         }
       });
       const orderId = orderResponse.data.id; // Assuming the response contains the order ID
@@ -115,6 +123,7 @@ function AddOrderForm() {
       setLoading(false);
     }
   };
+
 
   return (
     <div>

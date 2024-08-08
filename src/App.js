@@ -40,7 +40,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={isLoggedIn ? <Home /> : <Navigate to="/sign-in" />} />
           <Route path="/sign-in" element={isLoggedIn ? <Navigate to="/" /> : <SignIn />} />
-          <Route path="/sign-up" element={isLoggedIn ? <Navigate to="/" /> : <SignUp />} />
+          <Route path="/sign-up" element={ <SignUp />} />
 
           {/* Protected Routes */}
           <Route path="/products" element={isLoggedIn ? <ProductList /> : <Navigate to="/sign-in" />} />

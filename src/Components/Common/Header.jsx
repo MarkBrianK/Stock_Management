@@ -61,18 +61,18 @@ function Header() {
   );
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" style={{height:"15vh"}} >
       <Toolbar>
         {isMobile && (
           <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerToggle}>
             <MenuIcon />
           </IconButton>
         )}
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        <Typography variant="h6" sx={{ flexGrow: 1, fontSize: "16px",  }}>
           Soy United Stock System
         </Typography>
         {!isMobile && (
-          <>
+          <div >
             <Button color="inherit" component={Link} to="/">Home</Button>
             <Button color="inherit" component={Link} to="/products">Products</Button>
             <Button color="inherit" component={Link} to="/sales">Sales</Button>
@@ -81,7 +81,7 @@ function Header() {
             <Button color="inherit" component={Link} to="/meetings">Meetings</Button>
             <Button color="inherit" component={Link} to="/expenses">Expenses</Button>
             {isLoggedIn && <Button color="error" onClick={handleLogout}>Log Out</Button>}
-          </>
+          </div>
         )}
       </Toolbar>
       <Drawer anchor="left" open={drawerOpen} onClose={handleDrawerToggle}>

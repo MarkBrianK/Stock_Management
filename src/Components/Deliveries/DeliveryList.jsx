@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { List, ListItem, ListItemText, Typography, CircularProgress, IconButton, Button, Box, TextField } from "@mui/material";
+import {
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+  CircularProgress,
+  IconButton,
+  Button,
+  Box,
+  TextField,
+} from "@mui/material";
 import { Edit, Delete, Save, Cancel } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
@@ -15,64 +25,62 @@ function DeliveryList() {
   useEffect(() => {
     const fetchDeliveries = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:3000/deliveries');
+        const response = await axios.get("http://127.0.0.1:3000/deliveries");
         setDeliveryData(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching deliveries data:', error);
-        setError('Error fetching deliveries data');
+        setError("Error fetching deliveries data");
         setLoading(false);
       }
     };
-
     fetchDeliveries();
   }, []);
 
   const handleEdit = (delivery) => {
     setEditingId(delivery.id);
     setEditValues({
-      address: delivery.address,
-      delivery_date: new Date(delivery.delivery_date).toISOString().split('T')[0],
-      status: delivery.status
+      address: delivery.address || "",
+      delivery_date: delivery.delivery_date
+        ? new Date(delivery.delivery_date).toISOString().split("T")[0]
+        : "",
+      status: delivery.status || "",
     });
   };
 
   const handleSave = async (id) => {
     try {
       await axios.put(`http://127.0.0.1:3000/deliveries/${id}`, editValues);
-      setDeliveryData((prevData) => prevData.map((delivery) =>
-        delivery.id === id ? { ...delivery, ...editValues } : delivery
-      ));
+      setDeliveryData((prevData) =>
+        prevData.map((delivery) =>
+          delivery.id === id ? { ...delivery, ...editValues } : delivery
+        )
+      );
       setEditingId(null);
     } catch (error) {
-      console.error('Error updating delivery:', error);
-      setError('Error updating delivery');
+      setError("Error updating delivery");
     }
   };
 
-  const handleCancel = () => {
-    setEditingId(null);
-  };
+  const handleCancel = () => setEditingId(null);
 
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://127.0.0.1:3000/deliveries/${id}`);
-      setDeliveryData((prevData) => prevData.filter((delivery) => delivery.id !== id));
+      setDeliveryData((prevData) =>
+        prevData.filter((delivery) => delivery.id !== id)
+      );
     } catch (error) {
-      console.error('Error deleting delivery:', error);
-      setError('Error deleting delivery');
+      setError("Error deleting delivery");
     }
   };
 
-  const handleAddDelivery = () => {
-    navigate("/add-delivery");
-  };
+  const handleAddDelivery = () => navigate("/add-delivery");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditValues((prevValues) => ({
       ...prevValues,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -81,7 +89,12 @@ function DeliveryList() {
 
   return (
     <Box padding={3}>
-      <Button variant="contained" color="primary" onClick={handleAddDelivery} style={{ marginBottom: 16 }}>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleAddDelivery}
+        style={{ marginBottom: 16 }}
+      >
         Add Delivery
       </Button>
       {deliveryData.length === 0 ? (
@@ -115,7 +128,10 @@ function DeliveryList() {
                     margin="normal"
                   />
                   <Box display="flex" justifyContent="flex-end" marginTop={1}>
-                    <IconButton onClick={() => handleSave(delivery.id)} color="primary">
+                    <IconButton
+                      onClick={() => handleSave(delivery.id)}
+                      color="primary"
+                    >
                       <Save />
                     </IconButton>
                     <IconButton onClick={handleCancel} color="default">
@@ -126,13 +142,25 @@ function DeliveryList() {
               ) : (
                 <Box width="100%">
                   <ListItemText
-                    primary={delivery.address}
-                    secondary={`Delivery Date: ${new Date(delivery.delivery_date).toLocaleDateString()} - Status: ${delivery.status}`}
+                    primary={delivery.address || "No Address"}
+                    secondary={`Scheduled Date: ${new Date(
+                      delivery.scheduled_date
+                    ).toLocaleDateString()} - Delivery Date: ${
+                      delivery.delivery_date
+                        ? new Date(delivery.delivery_date).toLocaleDateString()
+                        : "Not Delivered"
+                    } - Status: ${delivery.status || "Not Delivered"}`}
                   />
-                  <IconButton onClick={() => handleEdit(delivery)} color="primary">
+                  <IconButton
+                    onClick={() => handleEdit(delivery)}
+                    color="primary"
+                  >
                     <Edit />
                   </IconButton>
-                  <IconButton onClick={() => handleDelete(delivery.id)} color="secondary">
+                  <IconButton
+                    onClick={() => handleDelete(delivery.id)}
+                    color="secondary"
+                  >
                     <Delete />
                   </IconButton>
                 </Box>
