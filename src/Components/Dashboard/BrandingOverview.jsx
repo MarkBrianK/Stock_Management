@@ -135,7 +135,7 @@ function BrandingOverview() {
     },
     yaxis: {
       labels: {
-        formatter: (value) => Math.round(value), // Remove decimal places
+        formatter: (value) => Math.round(value), 
       },
     },
     colors: [colors.sales, colors.orders, colors.profit, colors.stock],
