@@ -1,17 +1,29 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Box, Typography, CircularProgress, List, ListItem, ListItemText, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  List,
+  ListItem,
+  ListItemText,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button
+} from "@mui/material";
 import { Delete, Info } from "@mui/icons-material";
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { useNavigate } from "react-router-dom";
+import styles from "../../Styles/MeetingList.module.css"; // Import CSS Module
 
 function MeetingList() {
   const [meetings, setMeetings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [meetingsForDate, setMeetingsForDate] = useState([]);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
   const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
@@ -31,17 +43,6 @@ function MeetingList() {
 
     fetchMeetings();
   }, []);
-
-  useEffect(() => {
-    const filteredMeetings = meetings.filter(
-      (meeting) => new Date(meeting.scheduled_date).toDateString() === selectedDate.toDateString()
-    );
-    setMeetingsForDate(filteredMeetings);
-  }, [selectedDate, meetings]);
-
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
 
   const handleDelete = async (id) => {
     try {
@@ -70,7 +71,7 @@ function MeetingList() {
 
   // Add custom class to dates with meetings
   const tileClassName = ({ date }) => {
-    return meetingDates.has(date.toDateString()) ? 'highlight' : null;
+    return meetingDates.has(date.toDateString()) ? styles.highlight : null;
   };
 
   if (loading) return <CircularProgress />;
@@ -79,8 +80,6 @@ function MeetingList() {
   return (
     <Box>
       <Calendar
-        onChange={handleDateChange}
-        value={selectedDate}
         tileClassName={tileClassName}
       />
       <Box marginTop={2}>
@@ -92,11 +91,11 @@ function MeetingList() {
         >
           Add Meeting
         </Button>
-        {meetingsForDate.length === 0 ? (
-          <Typography>No meetings scheduled for this date.</Typography>
+        {meetings.length === 0 ? (
+          <Typography>No meetings available.</Typography>
         ) : (
           <List>
-            {meetingsForDate.map((meeting) => (
+            {meetings.map((meeting) => (
               <ListItem key={meeting.id}>
                 <ListItemText
                   primary={meeting.title}

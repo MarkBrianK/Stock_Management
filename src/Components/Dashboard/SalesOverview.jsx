@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Typography, Card, CardContent, CircularProgress } from "@mui/material";
+import ApexCharts from "react-apexcharts";
 
 function SalesOverview() {
   const [salesData, setSalesData] = useState([]);
@@ -26,14 +27,64 @@ function SalesOverview() {
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
-  // Calculate total sales, ensuring amount is treated as a number
-  const totalSales = salesData.reduce((acc, sale) => acc + (parseFloat(sale.total_price) || 0), 0);
+  // Prepare data for charts
+  const chartData = {
+    revenueSeries: [
+      {
+        name: 'Revenue',
+        data: salesData.map(sale => ({
+          x: new Date(sale.sale_date).toLocaleDateString(), // Format date for x-axis
+          y: parseFloat(sale.total_price),
+        })),
+      },
+    ],
+    quantitySeries: [
+      {
+        name: 'Quantity Sold',
+        data: salesData.map(sale => ({
+          x: new Date(sale.sale_date).toLocaleDateString(), // Format date for x-axis
+          y: sale.quantity,
+        })),
+      },
+    ],
+    options: {
+      chart: {
+        type: 'line',
+      },
+      xaxis: {
+        type: 'category', // Ensures categories are used for the x-axis
+        title: {
+          text: 'Date',
+        },
+      },
+      yaxis: {
+        title: {
+          text: 'Amount',
+        },
+      },
+      title: {
+        text: 'Sales Overview',
+        align: 'left',
+      },
+    },
+  };
 
   return (
     <Card>
       <CardContent>
-        <Typography variant="h6">Total Sales Amount</Typography>
-        <Typography variant="h4">${totalSales.toFixed(2)}</Typography>
+        <Typography variant="h6">Sales Overview</Typography>
+        <ApexCharts
+          options={{ ...chartData.options, title: { text: 'Revenue Over Time' } }}
+          series={chartData.revenueSeries}
+          type="line"
+          height={300}
+        />
+        <ApexCharts
+          options={{ ...chartData.options, title: { text: 'Quantity Sold Over Time' } }}
+          series={chartData.quantitySeries}
+          type="line"
+          height={300}
+        />
       </CardContent>
     </Card>
   );
