@@ -8,7 +8,8 @@ import {
   MenuItem,
   Select,
   InputLabel,
-  FormControl
+  FormControl,
+  Alert
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -18,18 +19,15 @@ function AddOrderForm() {
     status: "",
     product_id: "",
     quantity: "",
-  });
-  const [deliveryData, setDeliveryData] = useState({
-    scheduled_date: "",
-    delivery_date: "",
-    status: "",
+    price: ""
   });
   const [products, setProducts] = useState([]);
   const [productPrice, setProductPrice] = useState(0);
+  const [productStock, setProductStock] = useState(0); // Track product stock
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [stockError, setStockError] = useState(null); // Track stock errors
   const navigate = useNavigate();
-
 
   const currentUserId = localStorage.getItem('user_id');
 
@@ -41,6 +39,7 @@ function AddOrderForm() {
         const initialProduct = response.data.find(product => product.id === parseInt(orderData.product_id));
         if (initialProduct) {
           setProductPrice(initialProduct.price);
+          setProductStock(initialProduct.stock_level); // Set initial stock level
         }
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -72,48 +71,35 @@ function AddOrderForm() {
       const selectedProduct = products.find(product => product.id === parseInt(value));
       if (selectedProduct) {
         setProductPrice(selectedProduct.price);
+        setProductStock(selectedProduct.stock_level); // Update stock level
       }
     }
-  };
-
-  const handleDeliveryChange = (e) => {
-    const { name, value } = e.target;
-    setDeliveryData(prevData => ({
-      ...prevData,
-      [name]: value
-    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
+    // Check if quantity exceeds stock level
+    if (orderData.quantity > productStock) {
+      setStockError('Quantity exceeds available stock.');
+      setLoading(false);
+      return;
+    }
+
+    setStockError(null); // Clear stock error if valid
+
     try {
-      // Submit order first
-      const orderResponse = await axios.post("http://127.0.0.1:3000/orders", {
+      await axios.post("http://127.0.0.1:3000/orders", {
         order: {
           order_date: orderData.order_date,
           status: orderData.status,
           user_id: currentUserId,
-          order_details_attributes: [
-            {
-              product_id: orderData.product_id,
-              quantity: orderData.quantity,
-              price: orderData.price
-            }
-          ]
+          product_id: orderData.product_id,
+          quantity: orderData.quantity,
+          price: orderData.price
         }
       });
-      const orderId = orderResponse.data.id; // Assuming the response contains the order ID
-
-      // Submit delivery details if provided
-      if (deliveryData.scheduled_date || deliveryData.delivery_date || deliveryData.status) {
-        await axios.post("http://127.0.0.1:3000/deliveries", {
-          delivery: {
-            ...deliveryData,
-            order_id: orderId
-          }
-        });
-      }
 
       navigate("/orders"); // Redirect to the orders list page
     } catch (error) {
@@ -124,12 +110,12 @@ function AddOrderForm() {
     }
   };
 
-
   return (
     <div>
       <Typography variant="h4">Add Order</Typography>
       {loading && <CircularProgress />}
       {error && <Typography color="error">{error}</Typography>}
+      {stockError && <Alert severity="error">{stockError}</Alert>} {/* Display stock error */}
       <form onSubmit={handleSubmit}>
         <Typography variant="h5">Order Details</Typography>
         <TextField
@@ -140,6 +126,7 @@ function AddOrderForm() {
           onChange={handleOrderChange}
           fullWidth
           margin="normal"
+          InputLabelProps={{ shrink: true }}
         />
         <TextField
           label="Status"
@@ -148,9 +135,10 @@ function AddOrderForm() {
           onChange={handleOrderChange}
           fullWidth
           margin="normal"
+          InputLabelProps={{ shrink: true }}
         />
         <FormControl fullWidth margin="normal">
-          <InputLabel>Product</InputLabel>
+          <InputLabel shrink>Product</InputLabel>
           <Select
             name="product_id"
             value={orderData.product_id}
@@ -173,6 +161,7 @@ function AddOrderForm() {
           onChange={handleOrderChange}
           fullWidth
           margin="normal"
+          InputLabelProps={{ shrink: true }}
         />
         <TextField
           label="Price"
@@ -182,33 +171,7 @@ function AddOrderForm() {
           InputProps={{ readOnly: true }}
           fullWidth
           margin="normal"
-        />
-        <Typography variant="h5">Delivery Details</Typography>
-        <TextField
-          label="Scheduled Date"
-          name="scheduled_date"
-          type="date"
-          value={deliveryData.scheduled_date}
-          onChange={handleDeliveryChange}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Delivery Date"
-          name="delivery_date"
-          type="date"
-          value={deliveryData.delivery_date}
-          onChange={handleDeliveryChange}
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Delivery Status"
-          name="status"
-          value={deliveryData.status}
-          onChange={handleDeliveryChange}
-          fullWidth
-          margin="normal"
+          InputLabelProps={{ shrink: true }}
         />
         <Button type="submit" variant="contained" color="primary" disabled={loading}>
           Add Order

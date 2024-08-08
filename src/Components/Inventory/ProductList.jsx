@@ -9,6 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert'; // Import Alert component
 import { useNavigate } from 'react-router-dom';
 
 function ProductList() {
@@ -51,6 +52,9 @@ function ProductList() {
     navigate('/add-product'); // Redirect to the add product page
   };
 
+  // Define a low stock threshold
+  const LOW_STOCK_THRESHOLD = 10;
+
   if (loading) {
     return <CircularProgress />;
   }
@@ -69,35 +73,47 @@ function ProductList() {
         variant="contained"
         color="primary"
         onClick={handleAddProduct}
-        style={{ marginBottom: '16px', marginTop:'10px' }}
+        style={{ marginBottom: '16px', marginTop: '10px' }}
       >
         Add Product
       </Button>
       <List>
-        {productData.map((product) => (
-          <ListItem key={product.id} divider>
-            <ListItemText
-              primary={
-                <Typography variant="h6">
-                  {product.name}
-                </Typography>
-              }
-              secondary={
-                <>
-                  <Typography variant="body2">Description: {product.description}</Typography>
-                  <Typography variant="body2">Price: ${product.price}</Typography>
-                  <Typography variant="body2">Stock: {product.stock_level}</Typography>
-                </>
-              }
-            />
-            <IconButton edge="end" aria-label="edit" onClick={() => handleEdit(product.id)}>
-              <EditIcon />
-            </IconButton>
-            <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(product.id)}>
-              <DeleteIcon />
-            </IconButton>
-          </ListItem>
-        ))}
+        {productData.map((product) => {
+          // Check if stock level is below the threshold
+          const isOutOfStock = product.stock_level < LOW_STOCK_THRESHOLD;
+
+          return (
+            <ListItem key={product.id} divider>
+              <ListItemText
+                primary={
+                  <Typography variant="h6">
+                    {product.name}
+                  </Typography>
+                }
+                secondary={
+                  <>
+                    <Typography variant="body2">Description: {product.description}</Typography>
+                    <Typography variant="body2">Price: ${product.price}</Typography>
+                    <Typography variant="body2">
+                      Stock: {product.stock_level}
+                      {isOutOfStock && (
+                        <Alert severity="error" style={{ display: 'inline', marginLeft: '10px' }}>
+                          Low Stock
+                        </Alert>
+                      )}
+                    </Typography>
+                  </>
+                }
+              />
+              <IconButton edge="end" aria-label="edit" onClick={() => handleEdit(product.id)}>
+                <EditIcon />
+              </IconButton>
+              <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(product.id)}>
+                <DeleteIcon />
+              </IconButton>
+            </ListItem>
+          );
+        })}
       </List>
     </div>
   );

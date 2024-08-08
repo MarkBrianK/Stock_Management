@@ -44,6 +44,7 @@ function DeliveryList() {
         ? new Date(delivery.delivery_date).toISOString().split("T")[0]
         : "",
       status: delivery.status || "",
+      delivery_cost: delivery.delivery_cost || "", // Include delivery cost
     });
   };
 
@@ -127,6 +128,14 @@ function DeliveryList() {
                     onChange={handleChange}
                     margin="normal"
                   />
+                  <TextField
+                    label="Delivery Cost"
+                    name="delivery_cost"
+                    type="number"
+                    value={editValues.delivery_cost}
+                    onChange={handleChange}
+                    margin="normal"
+                  />
                   <Box display="flex" justifyContent="flex-end" marginTop={1}>
                     <IconButton
                       onClick={() => handleSave(delivery.id)}
@@ -142,8 +151,8 @@ function DeliveryList() {
               ) : (
                 <Box width="100%">
                   <ListItemText
-                    primary={delivery.address || "No Address"}
-                    secondary={`Scheduled Date: ${new Date(
+                    primary={`Order ID: ${delivery.order_id}`}
+                    secondary={`Address: ${delivery.address || "No Address"} - Scheduled Date: ${new Date(
                       delivery.scheduled_date
                     ).toLocaleDateString()} - Delivery Date: ${
                       delivery.delivery_date
@@ -151,18 +160,22 @@ function DeliveryList() {
                         : "Not Delivered"
                     } - Status: ${delivery.status || "Not Delivered"}`}
                   />
-                  <IconButton
-                    onClick={() => handleEdit(delivery)}
-                    color="primary"
-                  >
-                    <Edit />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => handleDelete(delivery.id)}
-                    color="secondary"
-                  >
-                    <Delete />
-                  </IconButton>
+                  {delivery.status !== "delivered" && (
+                    <>
+                      <IconButton
+                        onClick={() => handleEdit(delivery)}
+                        color="primary"
+                      >
+                        <Edit />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => handleDelete(delivery.id)}
+                        color="secondary"
+                      >
+                        <Delete />
+                      </IconButton>
+                    </>
+                  )}
                 </Box>
               )}
             </ListItem>

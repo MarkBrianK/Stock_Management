@@ -75,9 +75,9 @@ function Header() {
           <div >
             <Button color="inherit" component={Link} to="/">Home</Button>
             <Button color="inherit" component={Link} to="/products">Products</Button>
-            <Button color="inherit" component={Link} to="/sales">Sales</Button>
             <Button color="inherit" component={Link} to="/orders">Orders</Button>
             <Button color="inherit" component={Link} to="/deliveries">Deliveries</Button>
+            <Button color="inherit" component={Link} to="/sales">Sales</Button>
             <Button color="inherit" component={Link} to="/meetings">Meetings</Button>
             <Button color="inherit" component={Link} to="/expenses">Expenses</Button>
             {isLoggedIn && <Button color="error" onClick={handleLogout}>Log Out</Button>}

@@ -5,18 +5,14 @@ import {
   ListItem,
   ListItemText,
   Typography,
+  TextField,
   CircularProgress,
   IconButton,
   Button,
-  Box,
-  TextField,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select
+  Box
 } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
-import { useNavigate, } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function OrderList() {
   const [ordersData, setOrdersData] = useState([]);
@@ -24,7 +20,6 @@ function OrderList() {
   const [error, setError] = useState(null);
   const [editOrderId, setEditOrderId] = useState(null);
   const [editOrderData, setEditOrderData] = useState({});
-  const [products, setProducts] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -43,19 +38,6 @@ function OrderList() {
     fetchOrders();
   }, []);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get('http://127.0.0.1:3000/products');
-        setProducts(response.data);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://127.0.0.1:3000/orders/${id}`);
@@ -69,28 +51,21 @@ function OrderList() {
   const handleEditClick = (order) => {
     setEditOrderId(order.id);
     setEditOrderData({
-      ...order,
-      order_details: order.order_details.map(detail => ({
-        ...detail,
-        product_id: detail.product.id
-      }))
+      ...order
     });
   };
 
-  const handleEditChange = (e, index) => {
+  const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditOrderData(prevData => ({
       ...prevData,
-      order_details: prevData.order_details.map((detail, i) => i === index ? { ...detail, [name]: value } : detail)
+      [name]: value
     }));
   };
 
   const handleSave = async () => {
     try {
-      await axios.put(`http://127.0.0.1:3000/orders/${editOrderId}`, {
-        order: editOrderData,
-        order_details_attributes: editOrderData.order_details
-      });
+      await axios.put(`http://127.0.0.1:3000/orders/${editOrderId}`, editOrderData);
       setOrdersData(prevData => prevData.map(order => order.id === editOrderId ? editOrderData : order));
       setEditOrderId(null);
     } catch (error) {
@@ -119,57 +94,60 @@ function OrderList() {
             <ListItem key={order.id} divider>
               {editOrderId === order.id ? (
                 <>
-                  {order.order_details.map((detail, index) => (
-                    <Box key={detail.id} marginBottom={2}>
-                      <TextField
-                        label="Quantity"
-                        name="quantity"
-                        type="number"
-                        value={editOrderData.order_details[index].quantity}
-                        onChange={(e) => handleEditChange(e, index)}
-                        fullWidth
-                        margin="normal"
-                      />
-                      <FormControl fullWidth margin="normal">
-                        <InputLabel>Product</InputLabel>
-                        <Select
-                          name="product_id"
-                          value={editOrderData.order_details[index].product_id}
-                          onChange={(e) => handleEditChange(e, index)}
-                        >
-                          <MenuItem value="" disabled>Select a product</MenuItem>
-                          {products.map((product) => (
-                            <MenuItem key={product.id} value={product.id}>
-                              {product.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                      <TextField
-                        label="Price"
-                        name="price"
-                        type="number"
-                        value={editOrderData.order_details[index].price}
-                        onChange={(e) => handleEditChange(e, index)}
-                        fullWidth
-                        margin="normal"
-                      />
-                    </Box>
-                  ))}
+                  <TextField
+                    label="Order Date"
+                    name="order_date"
+                    type="date"
+                    value={editOrderData.order_date.split('T')[0]} // format for date input
+                    onChange={handleEditChange}
+                    fullWidth
+                    margin="normal"
+                  />
+                  <TextField
+                    label="Status"
+                    name="status"
+                    value={editOrderData.status}
+                    onChange={handleEditChange}
+                    fullWidth
+                    margin="normal"
+                  />
+                  <TextField
+                    label="Product ID"
+                    name="product_id"
+                    type="number"
+                    value={editOrderData.product_id || ''}
+                    onChange={handleEditChange}
+                    fullWidth
+                    margin="normal"
+                  />
+                  <TextField
+                    label="Quantity"
+                    name="quantity"
+                    type="number"
+                    value={editOrderData.quantity || ''}
+                    onChange={handleEditChange}
+                    fullWidth
+                    margin="normal"
+                  />
+                  <TextField
+                    label="Price"
+                    name="price"
+                    type="number"
+                    value={editOrderData.price || ''}
+                    onChange={handleEditChange}
+                    fullWidth
+                    margin="normal"
+                  />
                   <Button variant="contained" color="primary" onClick={handleSave}>
                     Save
                   </Button>
                 </>
               ) : (
                 <>
-                  {order.order_details.map(detail => (
-                    <ListItemText
-                      key={detail.id}
-                      primary={`Product: ${detail.product?.name || 'No product name'}`}
-                      secondary={`Quantity: ${detail.quantity}, Price: ${detail.price}`}
-                    />
-                  ))}
-
+                  <ListItemText
+                    primary={`Order ID: ${order.id}`}
+                    secondary={`Date: ${new Date(order.order_date).toLocaleDateString()}, Status: ${order.status}`}
+                  />
                   <IconButton onClick={() => handleEditClick(order)} color="primary">
                     <Edit />
                   </IconButton>

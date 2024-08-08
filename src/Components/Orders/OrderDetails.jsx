@@ -6,7 +6,6 @@ import { Typography, CircularProgress, Button } from "@mui/material";
 function OrderDetails() {
   const { id } = useParams();
   const [orderData, setOrderData] = useState(null);
-  const [deliveryData, setDeliveryData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -15,8 +14,6 @@ function OrderDetails() {
       try {
         const response = await axios.get(`http://127.0.0.1:3000/orders/${id}`);
         setOrderData(response.data);
-        const deliveryResponse = await axios.get(`http://127.0.0.1:3000/deliveries/${response.data.delivery_id}`);
-        setDeliveryData(deliveryResponse.data);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching order data:', error);
@@ -46,17 +43,18 @@ function OrderDetails() {
     <div>
       <Typography variant="h4">Order Details</Typography>
       <Typography variant="h6">Order ID: {orderData.id}</Typography>
-      <Typography variant="body1">Customer Name: {orderData.customer_name}</Typography>
+      <Typography variant="body1">Product: {orderData.product_name}</Typography>
       <Typography variant="body1">Order Date: {new Date(orderData.order_date).toLocaleDateString()}</Typography>
-      <Typography variant="body1">Total Amount: ${orderData.total_amount}</Typography>
+      <Typography variant="body1">Quantity: {orderData.quantity}</Typography>
+      <Typography variant="body1">Price: ${orderData.price}</Typography>
       <Typography variant="body1">Status: {orderData.status}</Typography>
 
-      {deliveryData && (
+      {orderData.delivery && (
         <div>
           <Typography variant="h6">Delivery Details</Typography>
-          <Typography variant="body1">Address: {deliveryData.address}</Typography>
-          <Typography variant="body1">Delivery Date: {new Date(deliveryData.delivery_date).toLocaleDateString()}</Typography>
-          <Typography variant="body1">Delivery Status: {deliveryData.status}</Typography>
+          <Typography variant="body1">Scheduled Date: {new Date(orderData.delivery.scheduled_date).toLocaleDateString()}</Typography>
+          <Typography variant="body1">Delivery Date: {new Date(orderData.delivery.delivery_date).toLocaleDateString()}</Typography>
+          <Typography variant="body1">Delivery Status: {orderData.delivery.status}</Typography>
         </div>
       )}
 
