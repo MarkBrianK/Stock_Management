@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Typography, Card, CardContent, CircularProgress } from "@mui/material";
+import ApexCharts from "react-apexcharts";
 
 function ProfitOverview() {
   const [salesData, setSalesData] = useState([]);
@@ -11,7 +12,7 @@ function ProfitOverview() {
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
-        const salesResponse = await axios.get('http://127.0.0.1:3000/sales'); // Adjust the endpoint as needed
+        const salesResponse = await axios.get('http://127.0.0.1:3000/sales');
         setSalesData(salesResponse.data);
       } catch (error) {
         console.error('Error fetching sales data:', error);
@@ -22,7 +23,7 @@ function ProfitOverview() {
 
     const fetchExpensesData = async () => {
       try {
-        const expensesResponse = await axios.get('http://127.0.0.1:3000/expenses'); // Adjust the endpoint as needed
+        const expensesResponse = await axios.get('http://127.0.0.1:3000/expenses');
         setExpensesData(expensesResponse.data);
       } catch (error) {
         console.error('Error fetching expenses data:', error);
@@ -42,16 +43,59 @@ function ProfitOverview() {
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
-  // Ensure `amount` is treated as a number
+  // Calculate totals and profit
   const totalSales = salesData.reduce((acc, sale) => acc + (parseFloat(sale.total_price) || 0), 0);
   const totalExpenses = expensesData.reduce((acc, expense) => acc + (parseFloat(expense.amount) || 0), 0);
   const totalProfit = totalSales - totalExpenses;
+
+  // Prepare data for the chart
+  const chartData = {
+    series: [
+      {
+        name: 'Profit',
+        data: salesData.map(sale => {
+          const expense = expensesData.find(exp => new Date(exp.date).toLocaleDateString() === new Date(sale.sale_date).toLocaleDateString());
+          const profit = parseFloat(sale.total_price) - (expense ? parseFloat(expense.amount) : 0);
+          return {
+            x: new Date(sale.sale_date).toLocaleDateString(),
+            y: profit,
+          };
+        }),
+      },
+    ],
+    options: {
+      chart: {
+        type: 'line',
+      },
+      xaxis: {
+        type: 'category',
+        title: {
+          text: 'Date',
+        },
+      },
+      yaxis: {
+        title: {
+          text: 'Profit',
+        },
+      },
+      title: {
+        text: 'Profit Overview',
+        align: 'left',
+      },
+    },
+  };
 
   return (
     <Card>
       <CardContent>
         <Typography variant="h6">Total Profit</Typography>
-        <Typography variant="h4">${totalProfit.toFixed(2)}</Typography>
+        <Typography variant="h4">Ksh {totalProfit.toFixed(2)}</Typography>
+        <ApexCharts
+          options={chartData.options}
+          series={chartData.series}
+          type="line"
+          height={300}
+        />
       </CardContent>
     </Card>
   );
