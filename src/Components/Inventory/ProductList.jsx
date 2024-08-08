@@ -63,10 +63,6 @@ function ProductList() {
     return <Typography color="error">{error}</Typography>;
   }
 
-  if (productData.length === 0) {
-    return <Typography>No products available.</Typography>;
-  }
-
   return (
     <div>
       <Button
@@ -77,44 +73,48 @@ function ProductList() {
       >
         Add Product
       </Button>
-      <List>
-        {productData.map((product) => {
-          // Check if stock level is below the threshold
-          const isOutOfStock = product.stock_level < LOW_STOCK_THRESHOLD;
+      {productData.length === 0 ? (
+        <Typography>No products available.</Typography>
+      ) : (
+        <List>
+          {productData.map((product) => {
+            // Check if stock level is below the threshold
+            const isOutOfStock = product.stock_level < LOW_STOCK_THRESHOLD;
 
-          return (
-            <ListItem key={product.id} divider>
-              <ListItemText
-                primary={
-                  <Typography variant="h6">
-                    {product.name}
-                  </Typography>
-                }
-                secondary={
-                  <>
-                    <Typography variant="body2">Description: {product.description}</Typography>
-                    <Typography variant="body2">Price: ${product.price}</Typography>
-                    <Typography variant="body2">
-                      Stock: {product.stock_level}
-                      {isOutOfStock && (
-                        <Alert severity="error" style={{ display: 'inline', marginLeft: '10px' }}>
-                          Low Stock
-                        </Alert>
-                      )}
+            return (
+              <ListItem key={product.id} divider>
+                <ListItemText
+                  primary={
+                    <Typography variant="h6">
+                      {product.name}
                     </Typography>
-                  </>
-                }
-              />
-              <IconButton edge="end" aria-label="edit" onClick={() => handleEdit(product.id)}>
-                <EditIcon />
-              </IconButton>
-              <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(product.id)}>
-                <DeleteIcon />
-              </IconButton>
-            </ListItem>
-          );
-        })}
-      </List>
+                  }
+                  secondary={
+                    <>
+                      <Typography variant="body2">Description: {product.description}</Typography>
+                      <Typography variant="body2">Price: ${product.price}</Typography>
+                      <Typography variant="body2">
+                        Stock: {product.stock_level}
+                        {isOutOfStock && (
+                          <Alert severity="error" style={{ display: 'inline', marginLeft: '10px' }}>
+                            Low Stock
+                          </Alert>
+                        )}
+                      </Typography>
+                    </>
+                  }
+                />
+                <IconButton edge="end" aria-label="edit" onClick={() => handleEdit(product.id)}>
+                  <EditIcon />
+                </IconButton>
+                <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(product.id)}>
+                  <DeleteIcon />
+                </IconButton>
+              </ListItem>
+            );
+          })}
+        </List>
+      )}
     </div>
   );
 }
