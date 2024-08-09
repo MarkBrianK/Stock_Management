@@ -120,6 +120,7 @@ function DeliveryList() {
                     value={editValues.delivery_date}
                     onChange={handleChange}
                     margin="normal"
+                    InputLabelProps={{ shrink: true }}
                   />
                   <TextField
                     label="Status"

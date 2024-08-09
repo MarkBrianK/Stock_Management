@@ -12,22 +12,22 @@ function ProfitOverview() {
   useEffect(() => {
     const fetchSalesData = async () => {
       try {
-        const salesResponse = await axios.get('http://127.0.0.1:3000/sales');
+        const salesResponse = await axios.get("http://127.0.0.1:3000/sales");
         setSalesData(salesResponse.data);
       } catch (error) {
-        console.error('Error fetching sales data:', error);
-        setError('Error fetching sales data');
+        console.error("Error fetching sales data:", error);
+        setError("Error fetching sales data");
         setLoading(false);
       }
     };
 
     const fetchExpensesData = async () => {
       try {
-        const expensesResponse = await axios.get('http://127.0.0.1:3000/expenses');
+        const expensesResponse = await axios.get("http://127.0.0.1:3000/expenses");
         setExpensesData(expensesResponse.data);
       } catch (error) {
-        console.error('Error fetching expenses data:', error);
-        setError('Error fetching expenses data');
+        console.error("Error fetching expenses data:", error);
+        setError("Error fetching expenses data");
         setLoading(false);
       }
     };
@@ -48,39 +48,40 @@ function ProfitOverview() {
   const totalExpenses = expensesData.reduce((acc, expense) => acc + (parseFloat(expense.amount) || 0), 0);
   const totalProfit = totalSales - totalExpenses;
 
+  // Get current date
+  const currentDate = new Date().toLocaleDateString();
+
   // Prepare data for the chart
   const chartData = {
     series: [
       {
-        name: 'Profit',
-        data: salesData.map(sale => {
-          const expense = expensesData.find(exp => new Date(exp.date).toLocaleDateString() === new Date(sale.sale_date).toLocaleDateString());
-          const profit = parseFloat(sale.total_price) - (expense ? parseFloat(expense.amount) : 0);
-          return {
-            x: new Date(sale.sale_date).toLocaleDateString(),
-            y: profit,
-          };
-        }),
+        name: "Profit",
+        data: [
+          {
+            x: currentDate,
+            y: totalProfit,
+          },
+        ],
       },
     ],
     options: {
       chart: {
-        type: 'line',
+        type: "line",
       },
       xaxis: {
-        type: 'category',
+        type: "category",
         title: {
-          text: 'Date',
+          text: "Date",
         },
       },
       yaxis: {
         title: {
-          text: 'Profit',
+          text: "Profit",
         },
       },
       title: {
-        text: 'Profit Overview',
-        align: 'left',
+        text: "Profit Overview",
+        align: "left",
       },
     },
   };

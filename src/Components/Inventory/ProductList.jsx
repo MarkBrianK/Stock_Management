@@ -9,14 +9,19 @@ import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Button from '@mui/material/Button';
-import Alert from '@mui/material/Alert'; // Import Alert component
+import TextField from '@mui/material/TextField';
+import Alert from '@mui/material/Alert';
 import { useNavigate } from 'react-router-dom';
 
 function ProductList() {
   const [productData, setProductData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // Use useNavigate instead of useHistory
+  const [restockAmount, setRestockAmount] = useState({});
+  const [newCost, setNewCost] = useState({});
+  const [newPrice, setNewPrice] = useState({});
+  const [showRestock, setShowRestock] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,7 +40,7 @@ function ProductList() {
   }, []);
 
   const handleEdit = (id) => {
-    navigate(`/edit-product/${id}`); // Use navigate instead of history.push
+    navigate(`/edit-product/${id}`);
   };
 
   const handleDelete = async (id) => {
@@ -49,10 +54,45 @@ function ProductList() {
   };
 
   const handleAddProduct = () => {
-    navigate('/add-product'); // Redirect to the add product page
+    navigate('/add-product');
   };
 
-  // Define a low stock threshold
+  const handleRestock = async (id) => {
+    try {
+      const response = await axios.patch(`http://127.0.0.1:3000/products/${id}/restock`, {
+        restock_amount: restockAmount[id] || 0,
+        cost: newCost[id] || 0,
+        price: newPrice[id] || 0
+      });
+      setProductData(productData.map(product =>
+        product.id === id ? response.data : product
+      ));
+      setRestockAmount({ ...restockAmount, [id]: '' });
+      setNewCost({ ...newCost, [id]: '' });
+      setNewPrice({ ...newPrice, [id]: '' });
+
+      // Navigate to the expense page after successful restock
+      navigate('/expenses');
+    } catch (error) {
+      console.error('Error restocking product:', error);
+      setError('Error restocking product');
+    }
+  };
+
+  const handleRestockChange = (id, field, value) => {
+    if (field === 'amount') {
+      setRestockAmount({ ...restockAmount, [id]: value });
+    } else if (field === 'cost') {
+      setNewCost({ ...newCost, [id]: value });
+    } else if (field === 'price') {
+      setNewPrice({ ...newPrice, [id]: value });
+    }
+  };
+
+  const toggleRestockVisibility = (id) => {
+    setShowRestock(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
   const LOW_STOCK_THRESHOLD = 10;
 
   if (loading) {
@@ -78,7 +118,6 @@ function ProductList() {
       ) : (
         <List>
           {productData.map((product) => {
-            // Check if stock level is below the threshold
             const isOutOfStock = product.stock_level < LOW_STOCK_THRESHOLD;
 
             return (
@@ -104,12 +143,56 @@ function ProductList() {
                     </>
                   }
                 />
-                <IconButton edge="end" aria-label="edit" onClick={() => handleEdit(product.id)}>
-                  <EditIcon />
-                </IconButton>
-                <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(product.id)}>
-                  <DeleteIcon />
-                </IconButton>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <Button
+                    onClick={() => toggleRestockVisibility(product.id)}
+                    style={{ marginRight: '10px' }}
+                  >
+                    {showRestock[product.id] ? 'Close' : 'Restock'}
+                  </Button>
+                  {showRestock[product.id] && (
+                    <>
+                      <TextField
+                        label="Restock Amount"
+                        type="number"
+                        value={restockAmount[product.id] || ''}
+                        onChange={(e) => handleRestockChange(product.id, 'amount', e.target.value)}
+                        margin="dense"
+                        style={{ width: '100px', marginRight: '10px' }}
+                      />
+                      <TextField
+                        label="New Cost"
+                        type="number"
+                        value={newCost[product.id] || ''}
+                        onChange={(e) => handleRestockChange(product.id, 'cost', e.target.value)}
+                        margin="dense"
+                        style={{ width: '100px', marginRight: '10px' }}
+                      />
+                      <TextField
+                        label="New Price"
+                        type="number"
+                        value={newPrice[product.id] || ''}
+                        onChange={(e) => handleRestockChange(product.id, 'price', e.target.value)}
+                        margin="dense"
+                        style={{ width: '100px', marginRight: '10px' }}
+                      />
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => handleRestock(product.id)}
+                        style={{ marginTop: '8px', marginRight: '10px' }}
+                      >
+                        Restock
+                      </Button>
+                    </>
+                  )}
+                  <IconButton edge="end" aria-label="edit" onClick={() => handleEdit(product.id)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton edge="end" aria-label="delete" onClick={() => handleDelete(product.id)}>
+                    <DeleteIcon />
+                  </IconButton>
+                </div>
               </ListItem>
             );
           })}

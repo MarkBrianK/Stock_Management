@@ -27,44 +27,48 @@ function SalesOverview() {
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
+  // Aggregate sales data by current date
+  const currentDate = new Date().toLocaleDateString();
+  const aggregatedData = salesData.reduce(
+    (acc, sale) => {
+      const saleDate = new Date(sale.sale_date).toLocaleDateString();
+      if (saleDate === currentDate) {
+        acc.totalRevenue += parseFloat(sale.total_price) || 0;
+        acc.totalQuantity += sale.quantity || 0;
+      }
+      return acc;
+    },
+    { totalRevenue: 0, totalQuantity: 0 }
+  );
+
   // Prepare data for charts
-  const chartData = {
-    revenueSeries: [
-      {
-        name: 'Revenue',
-        data: salesData.map(sale => ({
-          x: new Date(sale.sale_date).toLocaleDateString(), // Format date for x-axis
-          y: parseFloat(sale.total_price),
-        })),
-      },
-    ],
-    quantitySeries: [
-      {
-        name: 'Quantity Sold',
-        data: salesData.map(sale => ({
-          x: new Date(sale.sale_date).toLocaleDateString(), // Format date for x-axis
-          y: sale.quantity,
-        })),
-      },
-    ],
-    options: {
-      chart: {
-        type: 'line',
-      },
-      xaxis: {
-        type: 'category', // Ensures categories are used for the x-axis
-        title: {
-          text: 'Date',
-        },
-      },
-      yaxis: {
-        title: {
-          text: 'Amount',
-        },
-      },
+  const revenueSeries = [
+    {
+      name: 'Revenue',
+      data: [{ x: currentDate, y: aggregatedData.totalRevenue }],
+    },
+  ];
+
+  const quantitySeries = [
+    {
+      name: 'Quantity Sold',
+      data: [{ x: currentDate, y: aggregatedData.totalQuantity }],
+    },
+  ];
+
+  const chartOptions = {
+    chart: {
+      type: 'line',
+    },
+    xaxis: {
+      type: 'category',
       title: {
-        text: 'Sales Overview',
-        align: 'left',
+        text: 'Date',
+      },
+    },
+    yaxis: {
+      title: {
+        text: 'Amount',
       },
     },
   };
@@ -74,14 +78,14 @@ function SalesOverview() {
       <CardContent>
         <Typography variant="h6">Sales Overview</Typography>
         <ApexCharts
-          options={{ ...chartData.options, title: { text: 'Revenue Over Time' } }}
-          series={chartData.revenueSeries}
+          options={{ ...chartOptions, title: { text: 'Total Revenue for Today' } }}
+          series={revenueSeries}
           type="line"
           height={300}
         />
         <ApexCharts
-          options={{ ...chartData.options, title: { text: 'Quantity Sold Over Time' } }}
-          series={chartData.quantitySeries}
+          options={{ ...chartOptions, title: { text: 'Total Quantity Sold for Today' } }}
+          series={quantitySeries}
           type="line"
           height={300}
         />

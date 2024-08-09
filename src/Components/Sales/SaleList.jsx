@@ -50,7 +50,7 @@ function SaleList() {
                     </Typography>
                     <Typography variant="body2">Quantity: {sale.quantity}</Typography>
                     <Typography variant="body2">
-                      Total Price: {sale.total_price ? `$${sale.total_price.toFixed(2)}` : 'No price info'}
+                      Total Price: {sale.total_price ? `$${sale.total_price}` : 'No price info'}
                     </Typography>
                     <Typography variant="body2">
                       Date: {sale.sale_date ? new Date(sale.sale_date).toLocaleDateString() : 'No date info'}
