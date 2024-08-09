@@ -25,7 +25,7 @@ function Header() {
     localStorage.removeItem('user_id');
 
     setIsLoggedIn(false);
-    window.location.reload()
+    window.location.reload();
     navigate('/sign-in');
   };
 
@@ -33,50 +33,48 @@ function Header() {
     <div>
       <List>
         <ListItem button component={Link} to="/" onClick={handleDrawerToggle}>
-          <ListItemText primary="Home" />
+          <i className="fas fa-home"></i> <ListItemText primary="Home" />
         </ListItem>
         <ListItem button component={Link} to="/products" onClick={handleDrawerToggle}>
-          <ListItemText primary="Products" />
+          <i className="fas fa-box"></i> <ListItemText primary="Products" />
         </ListItem>
         <ListItem button component={Link} to="/sales" onClick={handleDrawerToggle}>
-          <ListItemText primary="Sales" />
+          <i className="fas fa-chart-line"></i> <ListItemText primary="Sales" />
         </ListItem>
         <ListItem button component={Link} to="/orders" onClick={handleDrawerToggle}>
-          <ListItemText primary="Orders" />
-        </ListItem>
-        <ListItem button component={Link} to="/deliveries" onClick={handleDrawerToggle}>
-          <ListItemText primary="Deliveries" />
+          <i className="fas fa-shopping-cart"></i> <ListItemText primary="Orders" />
         </ListItem>
         <ListItem button component={Link} to="/meetings" onClick={handleDrawerToggle}>
-          <ListItemText primary="Meetings" />
+          <i className="fas fa-calendar-day"></i> <ListItemText primary="Meetings" />
         </ListItem>
         <ListItem button component={Link} to="/expenses" onClick={handleDrawerToggle}>
-          <ListItemText primary="Expenses" />
+          <i className="fas fa-dollar-sign"></i> <ListItemText primary="Expenses" />
         </ListItem>
-        <ListItem button onClick={handleLogout}>
-          <ListItemText primary="Log Out" sx={{ color: 'red' }} />
-        </ListItem>
+        {isLoggedIn && (
+          <ListItem button onClick={handleLogout}>
+            <i className="fas fa-sign-out-alt"></i> <ListItemText primary="Log Out" sx={{ color: 'red' }} />
+          </ListItem>
+        )}
       </List>
     </div>
   );
 
   return (
-    <AppBar position="static" style={{height:"15vh"}} >
+    <AppBar position="static" sx={{ height: "15vh", backgroundColor: theme.palette.primary.main }}>
       <Toolbar>
         {isMobile && (
           <IconButton edge="start" color="inherit" aria-label="menu" onClick={handleDrawerToggle}>
             <MenuIcon />
           </IconButton>
         )}
-        <Typography variant="h6" sx={{ flexGrow: 1, fontSize: "16px",  }}>
-          Soy United Stock System
+        <Typography variant="h6" sx={{ flexGrow: 1, fontSize: "24px", fontWeight: "bold", color: theme.palette.primary.contrastText }}>
+          SOY STOCK UNITED
         </Typography>
         {!isMobile && (
-          <div >
+          <div>
             <Button color="inherit" component={Link} to="/">Home</Button>
             <Button color="inherit" component={Link} to="/products">Products</Button>
             <Button color="inherit" component={Link} to="/orders">Orders</Button>
-            <Button color="inherit" component={Link} to="/deliveries">Deliveries</Button>
             <Button color="inherit" component={Link} to="/sales">Sales</Button>
             <Button color="inherit" component={Link} to="/meetings">Meetings</Button>
             <Button color="inherit" component={Link} to="/expenses">Expenses</Button>

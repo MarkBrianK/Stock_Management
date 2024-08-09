@@ -131,7 +131,7 @@ function ProductList() {
                   secondary={
                     <>
                       <Typography variant="body2">Description: {product.description}</Typography>
-                      <Typography variant="body2">Price: ${product.price}</Typography>
+                      <Typography variant="body2">Price: KSh {product.price}</Typography>
                       <Typography variant="body2">
                         Stock: {product.stock_level}
                         {isOutOfStock && (
@@ -161,7 +161,7 @@ function ProductList() {
                         style={{ width: '100px', marginRight: '10px' }}
                       />
                       <TextField
-                        label="New Cost"
+                        label="New Cost (KSh)"
                         type="number"
                         value={newCost[product.id] || ''}
                         onChange={(e) => handleRestockChange(product.id, 'cost', e.target.value)}
@@ -169,7 +169,7 @@ function ProductList() {
                         style={{ width: '100px', marginRight: '10px' }}
                       />
                       <TextField
-                        label="New Price"
+                        label="New Price (KSh)"
                         type="number"
                         value={newPrice[product.id] || ''}
                         onChange={(e) => handleRestockChange(product.id, 'price', e.target.value)}
