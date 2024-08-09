@@ -52,7 +52,8 @@ function AddOrderForm() {
 
   useEffect(() => {
     if (orderData.quantity && productPrice) {
-      const totalPrice = orderData.quantity * productPrice;
+      // Calculate total price and ensure it is an integer
+      const totalPrice = Math.round(orderData.quantity * productPrice);
       setOrderData(prevData => ({
         ...prevData,
         price: totalPrice
@@ -97,7 +98,7 @@ function AddOrderForm() {
           user_id: currentUserId,
           product_id: orderData.product_id,
           quantity: orderData.quantity,
-          price: orderData.price
+          price: parseInt(orderData.price) // Ensure price is an integer
         }
       });
 
