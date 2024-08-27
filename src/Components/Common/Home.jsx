@@ -7,10 +7,13 @@ import ProfitOverview from "../Dashboard/ProfitOverview";
 function Home() {
   return (
     <div>
-      <BrandingOverview />
-      <SalesOverview />
-      <StockOverview />
       <ProfitOverview />
+      <StockOverview />
+      <SalesOverview />
+      <BrandingOverview />
+
+
+
     </div>
   );
 }
