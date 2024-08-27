@@ -2,23 +2,17 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Typography, Card, CardContent, CircularProgress } from "@mui/material";
 import Chart from "react-apexcharts";
-import { format, parseISO, isValid, startOfDay } from "date-fns";
+import { format, parseISO, isValid, startOfDay, addDays } from "date-fns";
 
 const keyToLabel = {
-  sales: "Sales (Ksh)",
   orders: "Orders (Count)",
-  profit: "Profit (Ksh)",
-  stock: "Stock Level (Units)",
 };
 
 const colors = {
-  sales: "#1f77b4",  // Blue
   orders: "#ff7f0e", // Orange
-  profit: "#2ca02c", // Green
-  stock: "#d62728",  // Red
 };
 
-function BrandingOverview() {
+function OrdersOverview() { // Renamed the component to be more descriptive
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,17 +20,11 @@ function BrandingOverview() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [salesResponse, ordersResponse, expensesResponse, productsResponse] = await axios.all([
-          axios.get("http://127.0.0.1:3000/sales"),
+        const [ordersResponse] = await axios.all([
           axios.get("http://127.0.0.1:3000/orders"),
-          axios.get("http://127.0.0.1:3000/expenses"),
-          axios.get("http://127.0.0.1:3000/products"),
         ]);
 
-        const salesData = salesResponse.data;
         const ordersData = ordersResponse.data;
-        const expensesData = expensesResponse.data;
-        const productsData = productsResponse.data;
 
         // Aggregate orders by day
         const ordersByDay = ordersData.reduce((acc, order) => {
@@ -50,55 +38,38 @@ function BrandingOverview() {
           return acc;
         }, {});
 
-        // Aggregate stock levels by day
-        const stockByDay = productsData.reduce((acc, product) => {
-          const rawDate = product.created_at || "";
-          const parsedDate = parseISO(rawDate);
-          if (!isValid(parsedDate)) return acc;
-          const dayStart = startOfDay(parsedDate).toISOString();
-
-          if (!acc[dayStart]) acc[dayStart] = 0;
-          acc[dayStart] += parseFloat(product.stock_level) || 0;
-          return acc;
-        }, {});
-
-        // Compute cumulative stock levels
-        const stockLevels = {};
-        Object.keys(stockByDay)
-          .sort()
-          .forEach((date, index, sortedDates) => {
-            const cumulativeStock = sortedDates
-              .slice(0, index + 1)
-              .reduce((acc, date) => acc + (stockByDay[date] || 0), 0);
-            stockLevels[date] = cumulativeStock;
-          });
-
         // Create trends with aggregated data
-        const allDays = new Set([
-          ...salesData.map((sale) => startOfDay(parseISO(sale.sale_date)).toISOString()),
-          ...Object.keys(ordersByDay),
-          ...Object.keys(stockLevels),
-        ]);
+        const allDays = new Set(Object.keys(ordersByDay));
+        const sortedDays = Array.from(allDays).sort((a, b) => new Date(a) - new Date(b));
 
-        const completeTrends = Array.from(allDays).map((day) => {
+        const completeTrends = sortedDays.map((day) => {
           const formattedDate = format(parseISO(day), "yyyy-MM-dd");
-          const dailySales = salesData
-            .filter((sale) => startOfDay(parseISO(sale.sale_date)).toISOString() === day)
-            .reduce((acc, sale) => acc + parseFloat(sale.total_price), 0);
-          const dailyExpenses = expensesData
-            .filter((expense) => startOfDay(parseISO(expense.expense_date)).toISOString() === day)
-            .reduce((acc, expense) => acc + parseFloat(expense.amount), 0);
-
           return {
             date: formattedDate,
-            sales: dailySales,
             orders: ordersByDay[day] || 0,
-            profit: dailySales - dailyExpenses,
-            stock: stockLevels[day] || 0,
           };
         });
 
-        setData(completeTrends);
+        // Fill in missing days with zeros
+        const filledTrends = [];
+        for (let i = 0; i < completeTrends.length; i++) {
+          filledTrends.push(completeTrends[i]);
+
+          if (i < completeTrends.length - 1) {
+            const nextDay = startOfDay(addDays(parseISO(completeTrends[i].date), 1));
+            const diff = Math.floor(
+              (startOfDay(parseISO(completeTrends[i + 1].date)) - nextDay) / (1000 * 60 * 60 * 24)
+            );
+            for (let j = 0; j < diff; j++) {
+              filledTrends.push({
+                date: format(addDays(nextDay, j), "yyyy-MM-dd"),
+                orders: 0,
+              });
+            }
+          }
+        }
+
+        setData(filledTrends);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -115,20 +86,8 @@ function BrandingOverview() {
 
   const series = [
     {
-      name: keyToLabel.sales,
-      data: data.map((item) => ({ x: new Date(item.date).getTime(), y: item.sales })),
-    },
-    {
       name: keyToLabel.orders,
       data: data.map((item) => ({ x: new Date(item.date).getTime(), y: item.orders })),
-    },
-    {
-      name: keyToLabel.profit,
-      data: data.map((item) => ({ x: new Date(item.date).getTime(), y: item.profit })),
-    },
-    {
-      name: keyToLabel.stock,
-      data: data.map((item) => ({ x: new Date(item.date).getTime(), y: item.stock })),
     },
   ];
 
@@ -148,17 +107,17 @@ function BrandingOverview() {
         formatter: (value) => Math.round(value),
       },
     },
-    colors: [colors.sales, colors.orders, colors.profit, colors.stock],
+    colors: [colors.orders],
   };
 
   return (
     <Card>
       <CardContent>
-        <Typography variant="h6" gutterBottom>Business Daily Trends</Typography>
+        <Typography variant="h6" gutterBottom>Orders Daily Trends</Typography>
         <Chart options={options} series={series} type="line" height={350} />
       </CardContent>
     </Card>
   );
 }
 
-export default BrandingOverview;
+export default OrdersOverview;
