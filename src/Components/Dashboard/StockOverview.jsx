@@ -47,7 +47,7 @@ function StockOverview() {
         type: 'bar',
       },
       xaxis: {
-        categories: stockData.map(product => product.name), // Assuming 'name' is the product name
+        categories: stockData.map(product => product.name),
         title: {
           text: 'Products',
         },
