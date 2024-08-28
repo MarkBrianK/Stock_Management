@@ -23,18 +23,35 @@ function SaleList() {
     fetchSales();
   }, []);
 
+  // Sort sales data by sale_date (date and time) in descending order
+  const sortedSalesData = salesData.slice().sort((a, b) => new Date(b.sale_date) - new Date(a.sale_date));
+
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
+
+  // Formatting date to EAT (East Africa Time)
+  const formatDateToEAT = (dateString) => {
+    return new Date(dateString).toLocaleString('en-KE', {
+      timeZone: 'Africa/Nairobi', // EAT is the time zone for Africa/Nairobi
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    });
+  };
 
   return (
     <div>
       <Typography variant="h4">Sales List</Typography>
       <List>
-        {salesData.map((sale) => (
+        {sortedSalesData.map((sale) => (
           <ListItem key={sale.id}>
             <ListItemText
               primary={`Product: ${sale.product.name}`}
-              secondary={`Quantity: ${sale.quantity} | Commission: ${sale.commission} | Final Price: ${sale.final_price}`}
+              secondary={`Quantity: ${sale.quantity} | Commission: ${sale.commission} | Final Price: ${sale.final_price} | Date: ${formatDateToEAT(sale.sale_date)}`}
             />
           </ListItem>
         ))}
