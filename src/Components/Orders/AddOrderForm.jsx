@@ -19,7 +19,7 @@ function AddOrderForm() {
     status: "",
     product_id: "",
     quantity: "",
-    price: ""
+    selling_price: "" // Selling price per unit
   });
   const [products, setProducts] = useState([]);
   const [productPrice, setProductPrice] = useState(0);
@@ -51,15 +51,19 @@ function AddOrderForm() {
   }, [orderData.product_id]);
 
   useEffect(() => {
-    if (orderData.quantity && productPrice) {
-      // Calculate total price and ensure it is an integer
-      const totalPrice = Math.round(orderData.quantity * productPrice);
+    if (orderData.selling_price && orderData.quantity) {
+      // Calculate total price and commission based on selling price
+      const totalSellingPrice = Math.round(orderData.quantity * orderData.selling_price);
+      const basePrice = Math.round(orderData.quantity * productPrice);
+      const commission = totalSellingPrice - basePrice;
       setOrderData(prevData => ({
         ...prevData,
-        price: totalPrice
+        price: basePrice,
+        commission: commission.toFixed(2), // Adding commission to order data
+        final_price: totalSellingPrice.toFixed(2) // Adding final price to order data
       }));
     }
-  }, [orderData.quantity, productPrice]);
+  }, [orderData.selling_price, orderData.quantity, productPrice]);
 
   const handleOrderChange = (e) => {
     const { name, value } = e.target;
@@ -98,7 +102,9 @@ function AddOrderForm() {
           user_id: currentUserId,
           product_id: orderData.product_id,
           quantity: orderData.quantity,
-          price: parseInt(orderData.price) // Ensure price is an integer
+          price: parseFloat(orderData.price), // Sending the base price
+          commission: parseFloat(orderData.commission), // Send commission
+          final_price: parseFloat(orderData.final_price) // Send final price
         }
       });
 
@@ -165,10 +171,30 @@ function AddOrderForm() {
           InputLabelProps={{ shrink: true }}
         />
         <TextField
-          label="Price"
-          name="price"
+          label="Selling Price"
+          name="selling_price"
           type="number"
-          value={orderData.price}
+          value={orderData.selling_price}
+          onChange={handleOrderChange}
+          fullWidth
+          margin="normal"
+          InputLabelProps={{ shrink: true }}
+        />
+        <TextField
+          label="Commission"
+          name="commission"
+          type="number"
+          value={orderData.commission || ''}
+          InputProps={{ readOnly: true }}
+          fullWidth
+          margin="normal"
+          InputLabelProps={{ shrink: true }}
+        />
+        <TextField
+          label="Final Price"
+          name="final_price"
+          type="number"
+          value={orderData.final_price || ''}
           InputProps={{ readOnly: true }}
           fullWidth
           margin="normal"

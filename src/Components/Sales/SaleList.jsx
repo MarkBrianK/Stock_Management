@@ -14,8 +14,8 @@ function SaleList() {
         setSalesData(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching sales data:', error);
-        setError('Error fetching sales data');
+        console.error('Error fetching sales:', error);
+        setError('Error fetching sales');
         setLoading(false);
       }
     };
@@ -28,40 +28,17 @@ function SaleList() {
 
   return (
     <div>
-      {salesData.length === 0 ? (
-        <Typography>No sales available.</Typography>
-      ) : (
-        <List>
-          {salesData.map((sale) => (
-            <ListItem key={sale.id} divider>
-              <ListItemText
-                primary={
-                  <Typography variant="h6">
-                    Sale ID: {sale.id}
-                  </Typography>
-                }
-                secondary={
-                  <>
-                    <Typography variant="body2">
-                      Product: {sale.product ? sale.product.name : 'No product info'}
-                    </Typography>
-                    <Typography variant="body2">
-                      User: {sale.user ? sale.user.username : 'No user info'}
-                    </Typography>
-                    <Typography variant="body2">Quantity: {sale.quantity}</Typography>
-                    <Typography variant="body2">
-                      Total Price: {sale.total_price ? `Ksh ${sale.total_price}` : 'No price info'}
-                    </Typography>
-                    <Typography variant="body2">
-                      Date: {sale.sale_date ? new Date(sale.sale_date).toLocaleDateString() : 'No date info'}
-                    </Typography>
-                  </>
-                }
-              />
-            </ListItem>
-          ))}
-        </List>
-      )}
+      <Typography variant="h4">Sales List</Typography>
+      <List>
+        {salesData.map((sale) => (
+          <ListItem key={sale.id}>
+            <ListItemText
+              primary={`Product: ${sale.product.name}`}
+              secondary={`Quantity: ${sale.quantity} | Commission: ${sale.commission} | Final Price: ${sale.final_price}`}
+            />
+          </ListItem>
+        ))}
+      </List>
     </div>
   );
 }
