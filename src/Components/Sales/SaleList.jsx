@@ -14,8 +14,8 @@ function SaleList() {
         setSalesData(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching sales:', error);
-        setError('Error fetching sales');
+        console.error('Error fetching sales data:', error);
+        setError('Error fetching sales data');
         setLoading(false);
       }
     };
@@ -45,17 +45,46 @@ function SaleList() {
 
   return (
     <div>
-      <Typography variant="h4">Sales List</Typography>
-      <List>
-        {sortedSalesData.map((sale) => (
-          <ListItem key={sale.id}>
-            <ListItemText
-              primary={`Product: ${sale.product.name}`}
-              secondary={`Quantity: ${sale.quantity} | Commission: ${sale.commission} | Final Price: ${sale.final_price} | Date: ${formatDateToEAT(sale.sale_date)}`}
-            />
-          </ListItem>
-        ))}
-      </List>
+      {salesData.length === 0 ? (
+        <Typography>No sales available.</Typography>
+      ) : (
+        <>
+          <Typography variant="h4">Sales List</Typography>
+          <List>
+            {sortedSalesData.map((sale) => (
+              <ListItem key={sale.id} divider>
+                <ListItemText
+                  primary={
+                    <Typography variant="h6">
+                      Sale: {sale.id}
+                    </Typography>
+                  }
+                  secondary={
+                    <>
+                      <Typography variant="body2">
+                        Product: {sale.product ? sale.product.name : 'No product info'}
+                      </Typography>
+                      <Typography variant="body2">
+                        User: {sale.user ? sale.user.username : 'No user info'}
+                      </Typography>
+                      <Typography variant="body2">Quantity: {sale.quantity}</Typography>
+                      <Typography variant="body2">
+                        Commission: {sale.commission ? `Ksh ${sale.commission}` : 'No commission info'}
+                      </Typography>
+                      <Typography variant="body2">
+                        Final Price: {sale.final_price ? `Ksh ${sale.final_price}` : 'No final price info'}
+                      </Typography>
+                      <Typography variant="body2">
+                        Date: {sale.sale_date ? formatDateToEAT(sale.sale_date) : 'No date info'}
+                      </Typography>
+                    </>
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        </>
+      )}
     </div>
   );
 }
