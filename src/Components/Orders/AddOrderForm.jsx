@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 function AddOrderForm() {
   const [orderData, setOrderData] = useState({
     order_date: "",
-    status: "",
+    status: "", // Payment status
     product_id: "",
     quantity: "",
     selling_price: "" // Selling price per unit
@@ -98,7 +98,7 @@ function AddOrderForm() {
       await axios.post("http://127.0.0.1:3000/orders", {
         order: {
           order_date: orderData.order_date,
-          status: orderData.status,
+          status: orderData.status, // Send payment status
           user_id: currentUserId,
           product_id: orderData.product_id,
           quantity: orderData.quantity,
@@ -108,7 +108,7 @@ function AddOrderForm() {
         }
       });
 
-      navigate("/orders"); // Redirect to the orders list page
+      navigate("/sales"); // Redirect to the orders list page
     } catch (error) {
       console.error('Error adding order:', error);
       setError('Error adding order');
@@ -135,15 +135,19 @@ function AddOrderForm() {
           margin="normal"
           InputLabelProps={{ shrink: true }}
         />
-        <TextField
-          label="Status"
-          name="status"
-          value={orderData.status}
-          onChange={handleOrderChange}
-          fullWidth
-          margin="normal"
-          InputLabelProps={{ shrink: true }}
-        />
+        <FormControl fullWidth margin="normal">
+          <InputLabel shrink>Status</InputLabel>
+          <Select
+            name="status"
+            value={orderData.status}
+            onChange={handleOrderChange}
+            displayEmpty
+          >
+            <MenuItem value="" disabled>Select payment status</MenuItem>
+            <MenuItem value="paid">Paid</MenuItem>
+            <MenuItem value="not_paid">Not Paid</MenuItem>
+          </Select>
+        </FormControl>
         <FormControl fullWidth margin="normal">
           <InputLabel shrink>Product</InputLabel>
           <Select
