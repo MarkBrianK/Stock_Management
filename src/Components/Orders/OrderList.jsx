@@ -12,7 +12,6 @@ import {
   Box
 } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
 
 function OrderList() {
   const [ordersData, setOrdersData] = useState([]);
@@ -20,7 +19,6 @@ function OrderList() {
   const [error, setError] = useState(null);
   const [editOrderId, setEditOrderId] = useState(null);
   const [editOrderData, setEditOrderData] = useState({});
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -74,18 +72,12 @@ function OrderList() {
     }
   };
 
-  const handleAddOrder = () => {
-    navigate("/add-order");
-  };
 
   if (loading) return <CircularProgress />;
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
     <Box>
-      <Button variant="contained" color="primary" onClick={handleAddOrder} style={{ marginBottom: 16, marginTop: "10px" }}>
-        Add Order
-      </Button>
       {ordersData.length === 0 ? (
         <Typography>No orders available.</Typography>
       ) : (
