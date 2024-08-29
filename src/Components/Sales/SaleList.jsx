@@ -31,8 +31,9 @@ function SaleList() {
 
   // Formatting date to EAT (East Africa Time)
   const formatDateToEAT = (dateString) => {
-    return new Date(dateString).toLocaleString('en-KE', {
-      timeZone: 'Africa/Nairobi', // EAT is the time zone for Africa/Nairobi
+    const date = new Date(dateString);
+    return date.toLocaleString('en-KE', {
+      timeZone: 'Africa/Nairobi',
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -51,37 +52,40 @@ function SaleList() {
         <>
           <Typography variant="h4">Sales List</Typography>
           <List>
-            {sortedSalesData.map((sale) => (
-              <ListItem key={sale.id} divider>
-                <ListItemText
-                  primary={
-                    <Typography variant="h6">
-                      Sale: {sale.id}
-                    </Typography>
-                  }
-                  secondary={
-                    <>
-                      <Typography variant="body2">
-                        Product: {sale.product ? sale.product.name : 'No product info'}
+            {sortedSalesData.map((sale) => {
+
+              return (
+                <ListItem key={sale.id} divider>
+                  <ListItemText
+                    primary={
+                      <Typography variant="h6">
+                        Sale: {sale.id}
                       </Typography>
-                      <Typography variant="body2">
-                        User: {sale.user ? sale.user.username : 'No user info'}
-                      </Typography>
-                      <Typography variant="body2">Quantity: {sale.quantity}</Typography>
-                      <Typography variant="body2">
-                        Commission: {sale.commission ? `Ksh ${sale.commission}` : 'No commission info'}
-                      </Typography>
-                      <Typography variant="body2">
-                        Final Price: {sale.final_price ? `Ksh ${sale.final_price}` : 'No final price info'}
-                      </Typography>
-                      <Typography variant="body2">
-                        Date: {sale.sale_date ? formatDateToEAT(sale.sale_date) : 'No date info'}
-                      </Typography>
-                    </>
-                  }
-                />
-              </ListItem>
-            ))}
+                    }
+                    secondary={
+                      <div>
+                        <Typography variant="body2">
+                          Product: {sale.product ? sale.product.name : 'No product info'}
+                        </Typography>
+                        <Typography variant="body2">
+                          User: {sale.user ? sale.user.username : 'No user info'}
+                        </Typography>
+                        <Typography variant="body2">Quantity: {sale.quantity}</Typography>
+                        <Typography variant="body2">
+                          Commission: {sale.commission ? `Ksh ${sale.commission}` : 'No commission info'}
+                        </Typography>
+                        <Typography variant="body2">
+                          Final Price: {sale.final_price ? `Ksh ${sale.final_price}` : 'No final price info'}
+                        </Typography>
+                        <Typography variant="body2">
+                          Date: {sale.sale_date ? formatDateToEAT(sale.sale_date) : 'No date info'}
+                        </Typography>
+                      </div>
+                    }
+                  />
+                </ListItem>
+              );
+            })}
           </List>
         </>
       )}
