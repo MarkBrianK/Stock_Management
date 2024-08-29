@@ -21,6 +21,7 @@ function ProductList() {
   const [newCost, setNewCost] = useState({});
   const [newPrice, setNewPrice] = useState({});
   const [showRestock, setShowRestock] = useState({});
+  const [searchTerm, setSearchTerm] = useState(""); // State for search input
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -71,7 +72,6 @@ function ProductList() {
       setNewCost({ ...newCost, [id]: '' });
       setNewPrice({ ...newPrice, [id]: '' });
 
-      // Navigate to the expense page after successful restock
       navigate('/expenses');
     } catch (error) {
       console.error('Error restocking product:', error);
@@ -93,7 +93,15 @@ function ProductList() {
     setShowRestock(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value.toLowerCase());
+  };
+
   const LOW_STOCK_THRESHOLD = 10;
+
+  const filteredProducts = productData.filter(product =>
+    product.name.toLowerCase().includes(searchTerm)
+  );
 
   if (loading) {
     return <CircularProgress />;
@@ -105,6 +113,13 @@ function ProductList() {
 
   return (
     <div>
+        <TextField
+        label="Search Products"
+        variant="outlined"
+        onChange={handleSearchChange}
+        style={{ marginBottom: '16px' }}
+        fullWidth
+      />
       <Button
         variant="contained"
         color="primary"
@@ -113,11 +128,12 @@ function ProductList() {
       >
         Add Product
       </Button>
-      {productData.length === 0 ? (
+
+      {filteredProducts.length === 0 ? (
         <Typography>No products available.</Typography>
       ) : (
         <List>
-          {productData.map((product) => {
+          {filteredProducts.map((product) => {
             const isOutOfStock = product.stock_level < LOW_STOCK_THRESHOLD;
 
             return (
@@ -144,6 +160,12 @@ function ProductList() {
                   }
                 />
                 <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <Button
+                    onClick={() => navigate(`/add-order?product_id=${product.id}`)}
+                    style={{ marginRight: '10px' }}
+                  >
+                    Make an Order
+                  </Button>
                   <Button
                     onClick={() => toggleRestockVisibility(product.id)}
                     style={{ marginRight: '10px' }}
