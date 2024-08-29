@@ -11,15 +11,18 @@ import {
   FormControl,
   Alert
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function AddOrderForm() {
   const [orderData, setOrderData] = useState({
     order_date: "",
     status: "", // Payment status
     product_id: "",
-    quantity: "",
-    selling_price: "" // Selling price per unit
+    quantity: "", // Editable by user
+    selling_price: "", // Selling price per unit (user input)
+    price: "", // Base price (calculated)
+    commission: "", // Commission (calculated)
+    final_price: "" // Final price (calculated)
   });
   const [products, setProducts] = useState([]);
   const [productPrice, setProductPrice] = useState(0);
@@ -28,18 +31,31 @@ function AddOrderForm() {
   const [error, setError] = useState(null);
   const [stockError, setStockError] = useState(null); // Track stock errors
   const navigate = useNavigate();
-
-  const currentUserId = localStorage.getItem('user_id');
+  const location = useLocation();
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get('http://127.0.0.1:3000/products');
         setProducts(response.data);
-        const initialProduct = response.data.find(product => product.id === parseInt(orderData.product_id));
-        if (initialProduct) {
-          setProductPrice(initialProduct.price);
-          setProductStock(initialProduct.stock_level); // Set initial stock level
+
+        // Extract product ID from query params
+        const params = new URLSearchParams(location.search);
+        const productId = params.get("product_id");
+
+        if (productId) {
+          // Find and set the selected product
+          const selectedProduct = response.data.find(product => product.id === parseInt(productId));
+          if (selectedProduct) {
+            setProductPrice(selectedProduct.price);
+            setProductStock(selectedProduct.stock_level);
+            setOrderData(prevData => ({
+              ...prevData,
+              product_id: productId,
+              // Remove auto-fill logic
+              quantity: 1 // Default to 1 if desired
+            }));
+          }
         }
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -48,7 +64,7 @@ function AddOrderForm() {
     };
 
     fetchProducts();
-  }, [orderData.product_id]);
+  }, [location.search]);
 
   useEffect(() => {
     if (orderData.selling_price && orderData.quantity) {
@@ -77,7 +93,22 @@ function AddOrderForm() {
       if (selectedProduct) {
         setProductPrice(selectedProduct.price);
         setProductStock(selectedProduct.stock_level); // Update stock level
+        // Remove auto-fill logic for selling price
       }
+    }
+
+    if (name === "quantity") {
+      // Ensure quantity is a number
+      const quantity = parseInt(value, 10);
+      if (isNaN(quantity) || quantity < 0) {
+        setStockError('Quantity must not be blank');
+        return;
+      }
+      if (quantity > productStock) {
+        setStockError('Quantity exceeds available stock.');
+        return;
+      }
+      setStockError(null); // Clear stock error if valid
     }
   };
 
@@ -99,7 +130,7 @@ function AddOrderForm() {
         order: {
           order_date: orderData.order_date,
           status: orderData.status, // Send payment status
-          user_id: currentUserId,
+          user_id: localStorage.getItem('user_id'),
           product_id: orderData.product_id,
           quantity: orderData.quantity,
           price: parseFloat(orderData.price), // Sending the base price
